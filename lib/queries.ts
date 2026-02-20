@@ -166,6 +166,36 @@ export async function getAllFacilitySlugs(): Promise<string[]> {
   return allSlugs;
 }
 
+// Future: Build admin dashboard for sponsor self-service management.
+export async function getFeaturedFacilities(
+  stateCode: string,
+  city?: string
+): Promise<Facility[]> {
+  const supabase = createServerClient();
+  const today = new Date().toISOString().split('T')[0];
+
+  let query = supabase
+    .from('facilities')
+    .select('*')
+    .eq('state', stateCode.toUpperCase())
+    .eq('is_sponsored', true)
+    .or(`sponsor_expiry_date.is.null,sponsor_expiry_date.gte.${today}`)
+    .order('facility_name', { ascending: true });
+
+  if (city) {
+    query = query.ilike('city', city);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('getFeaturedFacilities error:', error.message);
+    return [];
+  }
+
+  return (data as Facility[]) ?? [];
+}
+
 export async function getAllCitiesByState(stateCode: string): Promise<CityStats[]> {
   const supabase = createServerClient();
   const allData: { city: string }[] = [];

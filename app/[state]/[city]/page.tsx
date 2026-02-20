@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getAllStates, getAllCitiesByState, getFacilitiesByCity } from '@/lib/queries';
+import { getAllStates, getAllCitiesByState, getFacilitiesByCity, getFeaturedFacilities } from '@/lib/queries';
 import {
   slugToStateCode,
   stateCodeToName,
@@ -52,7 +52,10 @@ export default async function CityPage({ params }: Props) {
   const cityName = slugToCity(citySlug);
   const stateName = stateCodeToName(stateCode);
 
-  const facilities = await getFacilitiesByCity(stateCode, cityName);
+  const [facilities, featured] = await Promise.all([
+    getFacilitiesByCity(stateCode, cityName),
+    getFeaturedFacilities(stateCode, cityName),
+  ]);
   if (facilities.length === 0) notFound();
 
   // Sort: sponsored first, then by safety grade (A→F), then by name
@@ -98,6 +101,71 @@ export default async function CityPage({ params }: Props) {
         <p className="mt-1 text-gray-500">
           {facilities.length} {facilities.length === 1 ? 'facility' : 'facilities'} found
         </p>
+
+        {/* Featured Facilities */}
+        {featured.length > 0 && (
+          <div className="mt-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M16.403 12.652a3 3 0 010-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Featured Facilities
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {featured.map(f => {
+                const facilitySlug = f.slug.split('/').pop() ?? f.slug;
+                const excerpt = f.ai_summary
+                  ? f.ai_summary.length > 120
+                    ? f.ai_summary.slice(0, 120) + '...'
+                    : f.ai_summary
+                  : null;
+
+                return (
+                  <Link
+                    key={f.id}
+                    href={`/${stateSlug}/${citySlug}/${facilitySlug}`}
+                    className="flex flex-col gap-2 rounded-xl border-2 border-amber-200 bg-white p-5 shadow-md transition-all hover:border-amber-300 hover:shadow-lg"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold text-gray-900">
+                        {toTitleCase(f.facility_name)}
+                      </span>
+                      <SafetyGradeBadge grade={f.safety_grade} size="sm" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-navy">
+                        <svg className="h-3 w-3 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.403 12.652a3 3 0 010-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Verified Facility
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {cityName}, {stateCode}
+                      </span>
+                    </div>
+                    {f.address && (
+                      <p className="text-sm text-gray-500">{f.address}</p>
+                    )}
+                    {f.phone && (
+                      <p className="text-sm text-gray-500">{f.phone}</p>
+                    )}
+                    {excerpt && (
+                      <p className="text-sm leading-relaxed text-gray-600">{excerpt}</p>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Facilities table */}
         <div className="mt-6 overflow-hidden rounded-xl border border-gray-200">
@@ -158,10 +226,10 @@ export default async function CityPage({ params }: Props) {
                             Verified
                           </span>
                         )}
-                        {facility.address && (
-                          <p className="mt-0.5 text-xs text-gray-400">{facility.address}</p>
-                        )}
                       </div>
+                      {facility.address && (
+                        <p className="mt-0.5 text-xs text-gray-400">{facility.address}</p>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex justify-center">
