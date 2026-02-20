@@ -15,6 +15,7 @@ import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import SafetyGradeBadge from '@/components/SafetyGradeBadge';
 import Footer from '@/components/Footer';
+import ShowMoreFeatured from '@/components/ShowMoreFeatured';
 
 interface Props {
   params: Promise<{ state: string; city: string }>;
@@ -115,9 +116,13 @@ export default async function CityPage({ params }: Props) {
               </svg>
               Featured Facilities
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {featured.map(f => {
-                const facilitySlug = f.slug.split('/').pop() ?? f.slug;
+            {(() => {
+              const MAX_VISIBLE = 4;
+              const visible = featured.slice(0, MAX_VISIBLE);
+              const overflow = featured.slice(MAX_VISIBLE);
+
+              function renderCard(f: typeof featured[number]) {
+                const fSlug = f.slug.split('/').pop() ?? f.slug;
                 const excerpt = f.ai_summary
                   ? f.ai_summary.length > 120
                     ? f.ai_summary.slice(0, 120) + '...'
@@ -127,7 +132,7 @@ export default async function CityPage({ params }: Props) {
                 return (
                   <Link
                     key={f.id}
-                    href={`/${stateSlug}/${citySlug}/${facilitySlug}`}
+                    href={`/${stateSlug}/${citySlug}/${fSlug}`}
                     className="flex flex-col gap-2 rounded-xl border-2 border-amber-200 bg-white p-5 shadow-md transition-all hover:border-amber-300 hover:shadow-lg"
                   >
                     <div className="flex items-center gap-2">
@@ -162,8 +167,23 @@ export default async function CityPage({ params }: Props) {
                     )}
                   </Link>
                 );
-              })}
-            </div>
+              }
+
+              return (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {visible.map(renderCard)}
+                  </div>
+                  {overflow.length > 0 && (
+                    <ShowMoreFeatured extraCount={overflow.length}>
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        {overflow.map(renderCard)}
+                      </div>
+                    </ShowMoreFeatured>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 

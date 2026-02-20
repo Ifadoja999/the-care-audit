@@ -15,6 +15,7 @@ import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import SafetyGradeBadge from '@/components/SafetyGradeBadge';
 import Footer from '@/components/Footer';
+import ShowMoreFeatured from '@/components/ShowMoreFeatured';
 
 interface Props {
   params: Promise<{ state: string }>;
@@ -54,14 +55,6 @@ export default async function StatePage({ params }: Props) {
   ).length;
   const abPct = total > 0 ? Math.round((abCount / total) * 100) : 0;
   const withViolations = facilities.filter(f => (f.total_violations ?? 0) > 0).length;
-
-  // Track which cities have F-grade facilities
-  const citiesWithFGrade = new Set<string>();
-  for (const f of facilities) {
-    if (f.safety_grade === 'F') {
-      citiesWithFGrade.add(f.city?.trim().toUpperCase());
-    }
-  }
 
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
@@ -116,8 +109,12 @@ export default async function StatePage({ params }: Props) {
               </svg>
               Featured Facilities
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {featured.map(f => {
+            {(() => {
+              const MAX_VISIBLE = 4;
+              const visible = featured.slice(0, MAX_VISIBLE);
+              const overflow = featured.slice(MAX_VISIBLE);
+
+              function renderCard(f: typeof featured[number]) {
                 const excerpt = f.ai_summary
                   ? f.ai_summary.length > 120
                     ? f.ai_summary.slice(0, 120) + '...'
@@ -162,8 +159,23 @@ export default async function StatePage({ params }: Props) {
                     )}
                   </Link>
                 );
-              })}
-            </div>
+              }
+
+              return (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {visible.map(renderCard)}
+                  </div>
+                  {overflow.length > 0 && (
+                    <ShowMoreFeatured extraCount={overflow.length}>
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        {overflow.map(renderCard)}
+                      </div>
+                    </ShowMoreFeatured>
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 
@@ -171,24 +183,18 @@ export default async function StatePage({ params }: Props) {
         <div className="mt-10">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">Browse by City</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {cities.map(({ city, facility_count }) => {
-              const hasFGrade = citiesWithFGrade.has(city.trim().toUpperCase());
-              return (
-                <Link
-                  key={city}
-                  href={`/${stateSlug}/${cityToSlug(city)}`}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm transition-all hover:border-navy hover:bg-gray-50"
-                >
-                  <span className="flex items-center gap-1.5 font-medium text-gray-800">
-                    {displayCity(city)}
-                    {hasFGrade && (
-                      <span className="inline-block h-2 w-2 rounded-full bg-red-500" title="Has facilities with F grade" />
-                    )}
-                  </span>
-                  <span className="ml-2 shrink-0 text-xs text-gray-400">{facility_count}</span>
-                </Link>
-              );
-            })}
+            {cities.map(({ city, facility_count }) => (
+              <Link
+                key={city}
+                href={`/${stateSlug}/${cityToSlug(city)}`}
+                className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm transition-all hover:border-navy hover:bg-gray-50"
+              >
+                <span className="font-medium text-gray-800">
+                  {displayCity(city)}
+                </span>
+                <span className="ml-2 shrink-0 text-xs text-gray-400">{facility_count}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </main>
