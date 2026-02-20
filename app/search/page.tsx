@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { searchFacilities } from '@/lib/queries';
+import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import SafetyGradeBadge from '@/components/SafetyGradeBadge';
 import Footer from '@/components/Footer';
@@ -70,7 +71,7 @@ export default async function SearchPage({ searchParams }: Props) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h2 className="text-lg font-semibold text-navy">
-                        {facility.facility_name}
+                        {toTitleCase(facility.facility_name)}
                       </h2>
                       <p className="mt-0.5 text-sm text-gray-500">
                         {displayCity(facility.city)}, {facility.state}

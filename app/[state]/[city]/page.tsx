@@ -10,6 +10,7 @@ import {
   slugToCity,
 } from '@/lib/states';
 import { generateCityMetadata, breadcrumbJsonLd } from '@/lib/seo';
+import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import SafetyGradeBadge from '@/components/SafetyGradeBadge';
@@ -143,7 +144,7 @@ export default async function CityPage({ params }: Props) {
                           href={`/${stateSlug}/${citySlug}/${facilitySlug}`}
                           className="font-medium text-navy hover:underline"
                         >
-                          {facility.facility_name}
+                          {toTitleCase(facility.facility_name)}
                         </Link>
                         {facility.is_sponsored && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-navy">
@@ -156,6 +157,9 @@ export default async function CityPage({ params }: Props) {
                             </svg>
                             Verified
                           </span>
+                        )}
+                        {facility.address && (
+                          <p className="mt-0.5 text-xs text-gray-400">{facility.address}</p>
                         )}
                       </div>
                     </td>

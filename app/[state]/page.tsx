@@ -52,6 +52,14 @@ export default async function StatePage({ params }: Props) {
   const abPct = total > 0 ? Math.round((abCount / total) * 100) : 0;
   const withViolations = facilities.filter(f => (f.total_violations ?? 0) > 0).length;
 
+  // Track which cities have F-grade facilities
+  const citiesWithFGrade = new Set<string>();
+  for (const f of facilities) {
+    if (f.safety_grade === 'F') {
+      citiesWithFGrade.add(f.city?.trim().toUpperCase());
+    }
+  }
+
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
     { name: stateName, href: `/${stateSlug}` },
@@ -96,16 +104,24 @@ export default async function StatePage({ params }: Props) {
         <div className="mt-10">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">Browse by City</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {cities.map(({ city, facility_count }) => (
-              <Link
-                key={city}
-                href={`/${stateSlug}/${cityToSlug(city)}`}
-                className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm transition-all hover:border-navy hover:bg-gray-50"
-              >
-                <span className="font-medium text-gray-800">{displayCity(city)}</span>
-                <span className="ml-2 shrink-0 text-xs text-gray-400">{facility_count}</span>
-              </Link>
-            ))}
+            {cities.map(({ city, facility_count }) => {
+              const hasFGrade = citiesWithFGrade.has(city.trim().toUpperCase());
+              return (
+                <Link
+                  key={city}
+                  href={`/${stateSlug}/${cityToSlug(city)}`}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm transition-all hover:border-navy hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-1.5 font-medium text-gray-800">
+                    {displayCity(city)}
+                    {hasFGrade && (
+                      <span className="inline-block h-2 w-2 rounded-full bg-red-500" title="Has facilities with F grade" />
+                    )}
+                  </span>
+                  <span className="ml-2 shrink-0 text-xs text-gray-400">{facility_count}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </main>

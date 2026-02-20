@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Loader2 } from 'lucide-react';
+import { toTitleCase } from '@/lib/utils';
 import SafetyGradeBadge from './SafetyGradeBadge';
 
 interface SearchResult {
@@ -163,7 +164,7 @@ export default function SearchBar({
               <SafetyGradeBadge grade={result.safety_grade} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-gray-900">
-                  {result.facility_name}
+                  {toTitleCase(result.facility_name)}
                 </p>
                 <p className="text-xs text-gray-500">
                   {displayCity(result.city)}, {result.state}

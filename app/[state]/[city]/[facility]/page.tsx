@@ -13,6 +13,7 @@ import {
   localBusinessJsonLd,
   breadcrumbJsonLd,
 } from '@/lib/seo';
+import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import SafetyGradeBadge from '@/components/SafetyGradeBadge';
@@ -85,7 +86,7 @@ export default async function FacilityPage({ params }: Props) {
     { name: 'Home', href: '/' },
     { name: stateName, href: `/${stateSlug}` },
     { name: cityName, href: `/${stateSlug}/${citySlug}` },
-    { name: facility.facility_name, href: `/${slug}` },
+    { name: toTitleCase(facility.facility_name), href: `/${slug}` },
   ];
 
   return (
@@ -113,7 +114,7 @@ export default async function FacilityPage({ params }: Props) {
             { label: 'Home', href: '/' },
             { label: stateName, href: `/${stateSlug}` },
             { label: cityName, href: `/${stateSlug}/${citySlug}` },
-            { label: facility.facility_name },
+            { label: toTitleCase(facility.facility_name) },
           ]}
         />
 
@@ -127,7 +128,7 @@ export default async function FacilityPage({ params }: Props) {
         >
           <div className="flex flex-wrap items-start gap-3">
             <h1 className="text-3xl font-bold text-gray-900">
-              {facility.facility_name}
+              {toTitleCase(facility.facility_name)}
             </h1>
             {facility.is_sponsored && (
               <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-navy">

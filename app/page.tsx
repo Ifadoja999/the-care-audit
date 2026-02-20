@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { getAllStates } from '@/lib/queries';
 import { ALL_STATE_CODES } from '@/lib/states';
 import { websiteSearchJsonLd, breadcrumbJsonLd } from '@/lib/seo';
@@ -54,6 +55,13 @@ export default async function HomePage() {
       {/* ── Hero ── */}
       <section className="bg-navy px-4 py-20 text-white">
         <div className="mx-auto max-w-3xl text-center">
+          <Image
+            src="/images/logo.png"
+            alt="The Care Audit logo"
+            width={80}
+            height={80}
+            className="mx-auto mb-6 h-20 w-auto"
+          />
           <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
             Find the Safety Grade for Any<br className="hidden sm:block" />
             Assisted Living Facility

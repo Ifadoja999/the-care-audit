@@ -15,19 +15,25 @@ export default function StateCard({ stateCode, facilityCount }: Props) {
     <div
       className={`flex flex-col gap-1 rounded-lg border p-3 transition-all ${
         hasData
-          ? 'border-gray-200 bg-white hover:border-navy hover:shadow-sm cursor-pointer'
-          : 'border-gray-100 bg-gray-50 cursor-default'
+          ? 'border-navy/30 bg-white shadow-sm hover:border-navy hover:shadow-md cursor-pointer'
+          : 'border-gray-100 bg-gray-50/50 cursor-default opacity-60'
       }`}
     >
-      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${hasData ? 'text-navy/50' : 'text-gray-300'}`}>
         {stateCode}
       </span>
       <span className={`text-sm font-semibold ${hasData ? 'text-gray-900' : 'text-gray-400'}`}>
         {name}
       </span>
-      <span className="text-xs text-gray-400">
-        {facilityCount.toLocaleString()} {facilityCount === 1 ? 'facility' : 'facilities'}
-      </span>
+      {hasData ? (
+        <span className="text-xs text-gray-500">
+          {facilityCount.toLocaleString()} {facilityCount === 1 ? 'facility' : 'facilities'}
+        </span>
+      ) : (
+        <span className="text-[11px] font-medium uppercase tracking-wide text-gray-300">
+          Coming Soon
+        </span>
+      )}
     </div>
   );
 
