@@ -4,12 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next-sitemap",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@next/third-parties": "^16.1.6",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.97.0",
+    "fuse.js": "^7.1.0",
+    "lucide-react": "^0.574.0",
     "next": "16.1.6",
+    "next-sitemap": "^4.2.3",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
