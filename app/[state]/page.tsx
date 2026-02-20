@@ -62,7 +62,7 @@ export default async function StatePage({ params }: Props) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-warm-50">
       <Header />
 
       {/* Schema.org BreadcrumbList */}
@@ -73,7 +73,7 @@ export default async function StatePage({ params }: Props) {
         }}
       />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 animate-fade-in">
         <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: stateName }]} />
 
         <h1 className="mt-4 text-3xl font-bold text-gray-900">
@@ -81,18 +81,18 @@ export default async function StatePage({ params }: Props) {
         </h1>
 
         {/* Stats bar */}
-        <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl bg-gray-50 p-6">
+        <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
           <div className="text-center">
-            <p className="text-3xl font-bold text-navy">{total.toLocaleString()}</p>
-            <p className="mt-1 text-sm text-gray-500">Total Facilities</p>
+            <p className="text-4xl font-bold text-navy">{total.toLocaleString()}</p>
+            <p className="mt-1.5 text-sm text-gray-500">Total Facilities</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-green-600">{abPct}%</p>
-            <p className="mt-1 text-sm text-gray-500">Graded A or B</p>
+            <p className="text-4xl font-bold text-green-600">{abPct}%</p>
+            <p className="mt-1.5 text-sm text-gray-500">Graded A or B</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-red-600">{withViolations.toLocaleString()}</p>
-            <p className="mt-1 text-sm text-gray-500">With Violations</p>
+            <p className="text-4xl font-bold text-red-600">{withViolations.toLocaleString()}</p>
+            <p className="mt-1.5 text-sm text-gray-500">With Violations</p>
           </div>
         </div>
 
@@ -182,17 +182,17 @@ export default async function StatePage({ params }: Props) {
         {/* Cities list */}
         <div className="mt-10">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">Browse by City</h2>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
             {cities.map(({ city, facility_count }) => (
               <Link
                 key={city}
                 href={`/${stateSlug}/${cityToSlug(city)}`}
-                className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm transition-all hover:border-navy hover:bg-gray-50"
+                className="flex items-center justify-between rounded-xl border border-warm-200 bg-white px-4 py-3 text-sm shadow-sm transition-all duration-200 hover:border-navy hover:shadow-md"
               >
                 <span className="font-medium text-gray-800">
                   {displayCity(city)}
                 </span>
-                <span className="ml-2 shrink-0 text-xs text-gray-400">{facility_count}</span>
+                <span className="ml-2 shrink-0 rounded-full bg-warm-100 px-2 py-0.5 text-xs font-medium text-gray-500">{facility_count}</span>
               </Link>
             ))}
           </div>

@@ -76,7 +76,7 @@ export default async function CityPage({ params }: Props) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-warm-50">
       <Header />
 
       {/* Schema.org BreadcrumbList */}
@@ -87,7 +87,7 @@ export default async function CityPage({ params }: Props) {
         }}
       />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 animate-fade-in">
         <Breadcrumb
           items={[
             { label: 'Home', href: '/' },
@@ -188,26 +188,26 @@ export default async function CityPage({ params }: Props) {
         )}
 
         {/* Facilities table */}
-        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="border-b border-warm-200 bg-warm-50">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Facility Name
                 </th>
-                <th className="px-4 py-3 text-center font-semibold text-gray-600">
-                  Safety Grade
+                <th className="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Grade
                 </th>
-                <th className="px-4 py-3 text-center font-semibold text-gray-600">
+                <th className="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                   Violations
                 </th>
-                <th className="hidden px-4 py-3 text-left font-semibold text-gray-600 sm:table-cell">
+                <th className="hidden px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
                   Last Inspection
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {sorted.map(facility => {
+            <tbody>
+              {sorted.map((facility, i) => {
                 const facilitySlug = facility.slug.split('/').pop() ?? facility.slug;
                 const inspDate = facility.last_inspection_date
                   ? new Date(facility.last_inspection_date).toLocaleDateString('en-US', {
@@ -222,15 +222,15 @@ export default async function CityPage({ params }: Props) {
                     key={facility.id}
                     className={
                       facility.is_sponsored
-                        ? 'bg-amber-50/60 transition-colors hover:bg-amber-50'
-                        : 'transition-colors hover:bg-gray-50'
+                        ? 'border-b border-warm-100 bg-amber-50/50 transition-colors duration-150 hover:bg-amber-50'
+                        : `border-b border-warm-100 transition-colors duration-150 hover:bg-warm-50 ${i % 2 === 1 ? 'bg-warm-50/40' : ''}`
                     }
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/${stateSlug}/${citySlug}/${facilitySlug}`}
-                          className="font-medium text-navy hover:underline"
+                          className="font-medium text-navy transition-colors duration-200 hover:text-navy-light hover:underline"
                         >
                           {toTitleCase(facility.facility_name)}
                         </Link>
@@ -251,15 +251,15 @@ export default async function CityPage({ params }: Props) {
                         <p className="mt-0.5 text-xs text-gray-400">{facility.address}</p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-5 py-3.5 text-center">
                       <div className="flex justify-center">
                         <SafetyGradeBadge grade={facility.safety_grade} />
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-700">
+                    <td className="px-5 py-3.5 text-center font-medium text-gray-700">
                       {facility.total_violations ?? 0}
                     </td>
-                    <td className="hidden px-4 py-3 text-gray-500 sm:table-cell">
+                    <td className="hidden px-5 py-3.5 text-gray-500 sm:table-cell">
                       {inspDate}
                     </td>
                   </tr>

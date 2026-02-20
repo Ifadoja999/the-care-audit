@@ -52,10 +52,10 @@ const severityColors: Record<string, string> = {
 /* ── Grade hero colors ─────────────────────────────────────────────────────── */
 
 const gradeHeroColors: Record<string, { ring: string; bg: string; text: string }> = {
-  A: { ring: 'ring-green-200', bg: 'bg-green-100', text: 'text-green-700' },
-  B: { ring: 'ring-blue-200', bg: 'bg-blue-100', text: 'text-blue-700' },
-  C: { ring: 'ring-yellow-200', bg: 'bg-yellow-100', text: 'text-yellow-700' },
-  F: { ring: 'ring-red-200', bg: 'bg-red-100', text: 'text-red-700' },
+  A: { ring: 'ring-green-200', bg: 'bg-green-50', text: 'text-green-700' },
+  B: { ring: 'ring-blue-200', bg: 'bg-blue-50', text: 'text-blue-700' },
+  C: { ring: 'ring-yellow-200', bg: 'bg-yellow-50', text: 'text-yellow-700' },
+  F: { ring: 'ring-red-200', bg: 'bg-red-50', text: 'text-red-700' },
 };
 
 /* ── Page component ────────────────────────────────────────────────────────── */
@@ -90,7 +90,7 @@ export default async function FacilityPage({ params }: Props) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-warm-50">
       <Header />
 
       {/* Schema.org JSON-LD */}
@@ -107,7 +107,7 @@ export default async function FacilityPage({ params }: Props) {
         }}
       />
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 animate-fade-in">
         {/* 1. Breadcrumb */}
         <Breadcrumb
           items={[
@@ -120,10 +120,10 @@ export default async function FacilityPage({ params }: Props) {
 
         {/* 2. Facility Header */}
         <div
-          className={`mt-6 rounded-xl p-6 ${
+          className={`mt-6 rounded-2xl p-6 ${
             facility.is_sponsored
               ? 'border-2 border-amber-300 bg-amber-50/30'
-              : ''
+              : 'border border-warm-200 bg-white shadow-sm'
           }`}
         >
           <div className="flex flex-wrap items-start gap-3">
@@ -161,14 +161,14 @@ export default async function FacilityPage({ params }: Props) {
         </div>
 
         {/* 3. Safety Grade Hero */}
-        <div className="mt-8 flex flex-col items-center rounded-2xl border border-gray-100 bg-gray-50 py-10">
+        <div className="mt-8 flex flex-col items-center rounded-2xl border border-warm-200 bg-white py-12 shadow-sm">
           <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
             Safety Grade
           </p>
           <div
-            className={`flex h-28 w-28 items-center justify-center rounded-full ring-4 ${hero.ring} ${hero.bg}`}
+            className={`flex h-32 w-32 items-center justify-center rounded-full ring-4 ${hero.ring} ${hero.bg}`}
           >
-            <span className={`text-6xl font-extrabold ${hero.text}`}>
+            <span className={`text-7xl font-extrabold ${hero.text}`}>
               {grade}
             </span>
           </div>
@@ -181,8 +181,8 @@ export default async function FacilityPage({ params }: Props) {
 
         {/* 4. AI Summary Box */}
         {facility.ai_summary && (
-          <div className="mt-8 rounded-xl border border-blue-100 bg-blue-50/50 p-6">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
               What This Means
             </h2>
             <p className="mt-2 leading-relaxed text-gray-700">
@@ -201,7 +201,7 @@ export default async function FacilityPage({ params }: Props) {
               href={facility.report_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-navy px-6 py-3 font-semibold text-white transition-colors hover:bg-navy-light"
+              className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-navy-light hover:shadow-md"
             >
               <svg
                 className="h-5 w-5"
@@ -226,10 +226,10 @@ export default async function FacilityPage({ params }: Props) {
 
         {/* 6. Violations Table */}
         <div className="mt-10">
-          <h2 className="text-xl font-bold text-gray-900">Cited Violations</h2>
+          <h2 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>Cited Violations</h2>
           {facility.violations.length === 0 ? (
             facility.total_violations > 0 ? (
-              <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-6 py-8 text-center">
+              <div className="mt-4 rounded-2xl border border-warm-200 bg-white px-6 py-8 text-center shadow-sm">
                 <p className="text-gray-600">
                   {facility.total_violations} violation{facility.total_violations === 1 ? ' was' : 's were'} cited in the most recent inspection.
                   Detailed violation records are being processed.
@@ -246,35 +246,35 @@ export default async function FacilityPage({ params }: Props) {
                 )}
               </div>
             ) : (
-              <p className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-6 py-8 text-center text-gray-500">
+              <p className="mt-4 rounded-2xl border border-warm-200 bg-white px-6 py-8 text-center text-gray-500 shadow-sm">
                 No violations were cited in the most recent inspection.
               </p>
             )
           ) : (
-            <div className="mt-4 overflow-hidden rounded-xl border border-gray-200">
+            <div className="mt-4 overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
+                  <thead className="border-b border-warm-200 bg-warm-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                      <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Code
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                      <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Description
                       </th>
-                      <th className="px-4 py-3 text-center font-semibold text-gray-600">
+                      <th className="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                         Severity
                       </th>
-                      <th className="hidden px-4 py-3 text-left font-semibold text-gray-600 md:table-cell">
+                      <th className="hidden px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 md:table-cell">
                         Date Cited
                       </th>
-                      <th className="hidden px-4 py-3 text-center font-semibold text-gray-600 md:table-cell">
+                      <th className="hidden px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 md:table-cell">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {facility.violations.map(v => {
+                  <tbody className="divide-y divide-warm-100">
+                    {facility.violations.map((v, i) => {
                       const dateCited = v.date_cited
                         ? new Date(v.date_cited).toLocaleDateString('en-US', {
                             month: 'short',
@@ -284,26 +284,26 @@ export default async function FacilityPage({ params }: Props) {
                         : '\u2014';
 
                       return (
-                        <tr key={v.id} className="transition-colors hover:bg-gray-50">
-                          <td className="px-4 py-3 font-mono text-xs text-gray-500">
+                        <tr key={v.id} className={`transition-colors duration-150 hover:bg-warm-50 ${i % 2 === 1 ? 'bg-warm-50/40' : ''}`}>
+                          <td className="px-5 py-3.5 font-mono text-xs text-gray-500">
                             {v.violation_code || '\u2014'}
                           </td>
-                          <td className="max-w-md px-4 py-3 text-gray-700">
+                          <td className="max-w-md px-5 py-3.5 text-gray-700">
                             {v.violation_description}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-5 py-3.5 text-center">
                             <span
-                              className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                              className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                 severityColors[v.severity_level] ?? severityColors.Low
                               }`}
                             >
                               {v.severity_level}
                             </span>
                           </td>
-                          <td className="hidden px-4 py-3 text-gray-500 md:table-cell">
+                          <td className="hidden px-5 py-3.5 text-gray-500 md:table-cell">
                             {dateCited}
                           </td>
-                          <td className="hidden px-4 py-3 text-center text-gray-500 md:table-cell">
+                          <td className="hidden px-5 py-3.5 text-center text-gray-500 md:table-cell">
                             {v.status}
                           </td>
                         </tr>

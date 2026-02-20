@@ -31,10 +31,10 @@ export default async function SearchPage({ searchParams }: Props) {
   const results = query.length >= 2 ? await searchFacilities(query) : [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-warm-50">
       <Header />
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 animate-fade-in">
         {query.length < 2 ? (
           <div className="py-16 text-center">
             <h1 className="text-2xl font-bold text-gray-900">Search</h1>
@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: Props) {
                 <Link
                   key={facility.id}
                   href={`/${facility.slug}`}
-                  className="block rounded-xl border border-gray-200 p-5 transition-colors hover:border-gray-300 hover:bg-gray-50"
+                  className="block rounded-xl border border-warm-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-navy hover:shadow-md"
                 >
                   <div className="flex items-start gap-4">
                     <div className="shrink-0 pt-0.5">

@@ -13,13 +13,13 @@ export default function StateCard({ stateCode, facilityCount }: Props) {
 
   const card = (
     <div
-      className={`flex flex-col gap-1 rounded-lg border p-3 transition-all ${
+      className={`flex flex-col gap-1 rounded-xl border p-3.5 transition-all duration-200 ${
         hasData
-          ? 'border-navy/30 bg-white shadow-sm hover:border-navy hover:shadow-md cursor-pointer'
-          : 'border-gray-100 bg-gray-50/50 cursor-default opacity-60'
+          ? 'border-navy/20 bg-white shadow-sm hover:border-navy hover:shadow-md cursor-pointer'
+          : 'border-warm-200 bg-warm-100/50 cursor-default opacity-50'
       }`}
     >
-      <span className={`text-[10px] font-bold uppercase tracking-wider ${hasData ? 'text-navy/50' : 'text-gray-300'}`}>
+      <span className={`text-[10px] font-bold uppercase tracking-wider ${hasData ? 'text-navy/40' : 'text-gray-300'}`}>
         {stateCode}
       </span>
       <span className={`text-sm font-semibold ${hasData ? 'text-gray-900' : 'text-gray-400'}`}>
