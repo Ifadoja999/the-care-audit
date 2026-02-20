@@ -17,6 +17,7 @@ export interface Facility {
   last_updated: string;
   is_sponsored?: boolean;
   sponsor_expiry_date?: string;
+  phone?: string;
 }
 
 export interface Violation {

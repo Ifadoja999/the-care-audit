@@ -145,6 +145,9 @@ export default async function FacilityPage({ params }: Props) {
           {facility.address && (
             <p className="mt-1 text-gray-500">{facility.address}</p>
           )}
+          {facility.phone && (
+            <p className="mt-1 text-sm text-gray-500">{facility.phone}</p>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
             <span>Assisted Living Facility</span>
             {inspDate && (
@@ -224,9 +227,28 @@ export default async function FacilityPage({ params }: Props) {
         <div className="mt-10">
           <h2 className="text-xl font-bold text-gray-900">Cited Violations</h2>
           {facility.violations.length === 0 ? (
-            <p className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-6 py-8 text-center text-gray-500">
-              No violations were cited in the most recent inspection.
-            </p>
+            facility.total_violations > 0 ? (
+              <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-6 py-8 text-center">
+                <p className="text-gray-600">
+                  {facility.total_violations} violation{facility.total_violations === 1 ? ' was' : 's were'} cited in the most recent inspection.
+                  Detailed violation records are being processed.
+                </p>
+                {facility.report_url && (
+                  <a
+                    href={facility.report_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-navy hover:underline"
+                  >
+                    View the official inspection report for full details →
+                  </a>
+                )}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-6 py-8 text-center text-gray-500">
+                No violations were cited in the most recent inspection.
+              </p>
+            )
           ) : (
             <div className="mt-4 overflow-hidden rounded-xl border border-gray-200">
               <div className="overflow-x-auto">
@@ -293,21 +315,6 @@ export default async function FacilityPage({ params }: Props) {
           )}
         </div>
 
-        {/* 7. Call to Action */}
-        <div className="mt-12 rounded-2xl border border-gray-100 bg-gray-50 px-6 py-10 text-center">
-          <h2 className="text-xl font-bold text-gray-900">
-            Need Help Choosing the Right Facility?
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-gray-500">
-            We connect families with senior living advisors at no cost.
-          </p>
-          <a
-            href="mailto:help@thecareaudit.com"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-navy px-8 py-3 font-semibold text-white transition-colors hover:bg-navy-light"
-          >
-            Get Free Guidance
-          </a>
-        </div>
       </main>
 
       <Footer />
