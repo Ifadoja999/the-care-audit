@@ -3,18 +3,23 @@ import type { Metadata } from 'next';
 import { searchFacilities } from '@/lib/queries';
 import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
-import SafetyGradeBadge from '@/components/SafetyGradeBadge';
+import ViolationCountBadge from '@/components/ViolationCountBadge';
 import Footer from '@/components/Footer';
 
 interface Props {
   searchParams: Promise<{ q?: string }>;
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { q } = await searchParams;
   const query = q?.trim() ?? '';
-  if (!query) return { title: 'Search' };
-  return { title: `Results for "${query}"` };
+  if (!query) return { title: 'Search', alternates: { canonical: `${SITE_URL}/search` } };
+  return {
+    title: `Results for "${query}"`,
+    alternates: { canonical: `${SITE_URL}/search` },
+  };
 }
 
 function displayCity(city: string) {
@@ -65,23 +70,21 @@ export default async function SearchPage({ searchParams }: Props) {
                   href={`/${facility.slug}`}
                   className="block rounded-xl border border-warm-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-navy hover:shadow-md"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 pt-0.5">
-                      <SafetyGradeBadge grade={facility.safety_grade} size="md" />
-                    </div>
-                    <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3">
                       <h2 className="text-lg font-semibold text-navy">
                         {toTitleCase(facility.facility_name)}
                       </h2>
-                      <p className="mt-0.5 text-sm text-gray-500">
-                        {displayCity(facility.city)}, {facility.state}
-                      </p>
-                      {facility.ai_summary && (
-                        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
-                          {facility.ai_summary}
-                        </p>
-                      )}
+                      <ViolationCountBadge totalViolations={facility.total_violations} size="sm" />
                     </div>
+                    <p className="mt-0.5 text-sm text-gray-500">
+                      {displayCity(facility.city)}, {facility.state}
+                    </p>
+                    {facility.ai_summary && (
+                      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                        {facility.ai_summary}
+                      </p>
+                    )}
                   </div>
                 </Link>
               ))}

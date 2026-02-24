@@ -9,11 +9,10 @@ import {
   cityToSlug,
   displayCity,
 } from '@/lib/states';
-import { generateStateMetadata, breadcrumbJsonLd } from '@/lib/seo';
+import { generateStateMetadata, breadcrumbJsonLd, collectionPageJsonLd } from '@/lib/seo';
 import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
-import SafetyGradeBadge from '@/components/SafetyGradeBadge';
 import Footer from '@/components/Footer';
 import ShowMoreFeatured from '@/components/ShowMoreFeatured';
 
@@ -50,11 +49,8 @@ export default async function StatePage({ params }: Props) {
   if (facilities.length === 0) notFound();
 
   const total = facilities.length;
-  const abCount = facilities.filter(
-    f => f.safety_grade === 'A' || f.safety_grade === 'B'
-  ).length;
-  const abPct = total > 0 ? Math.round((abCount / total) * 100) : 0;
-  const withViolations = facilities.filter(f => (f.total_violations ?? 0) > 0).length;
+  const hasInspectionData = facilities.some(f => f.total_violations !== null);
+  const totalCitations = facilities.reduce((sum, f) => sum + (f.total_violations ?? 0), 0);
 
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
@@ -72,27 +68,44 @@ export default async function StatePage({ params }: Props) {
           __html: JSON.stringify(breadcrumbJsonLd(breadcrumbItems)),
         }}
       />
+      {/* Schema.org CollectionPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(collectionPageJsonLd({
+            name: `Assisted Living Facility Inspection Reports in ${stateName}`,
+            description: `Inspection reports and violation data for ${total} assisted living facilities in ${stateName}.`,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com'}/${stateSlug}`,
+            count: total,
+          })),
+        }}
+      />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 animate-fade-in">
         <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: stateName }]} />
 
         <h1 className="mt-4 text-3xl font-bold text-gray-900">
-          Assisted Living Facility Safety Grades in {stateName}
+          Assisted Living Facility Inspection Reports in {stateName}
         </h1>
 
         {/* Stats bar */}
-        <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
+        <div className="mt-6 grid grid-cols-2 gap-4 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
           <div className="text-center">
             <p className="text-4xl font-bold text-navy">{total.toLocaleString()}</p>
             <p className="mt-1.5 text-sm text-gray-500">Total Facilities</p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-green-600">{abPct}%</p>
-            <p className="mt-1.5 text-sm text-gray-500">Graded A or B</p>
-          </div>
-          <div className="text-center">
-            <p className="text-4xl font-bold text-red-600">{withViolations.toLocaleString()}</p>
-            <p className="mt-1.5 text-sm text-gray-500">With Violations</p>
+            {hasInspectionData ? (
+              <>
+                <p className="text-4xl font-bold text-navy">{totalCitations.toLocaleString()}</p>
+                <p className="mt-1.5 text-sm text-gray-500">Total Citations</p>
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-gray-400">Pending</p>
+                <p className="mt-1.5 text-sm text-gray-500">Inspection Data</p>
+              </>
+            )}
           </div>
         </div>
 
@@ -131,7 +144,6 @@ export default async function StatePage({ params }: Props) {
                       <span className="text-lg font-semibold text-gray-900">
                         {toTitleCase(f.facility_name)}
                       </span>
-                      <SafetyGradeBadge grade={f.safety_grade} size="sm" />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-navy">
@@ -142,7 +154,7 @@ export default async function StatePage({ params }: Props) {
                             clipRule="evenodd"
                           />
                         </svg>
-                        Verified Facility
+                        Featured Verified
                       </span>
                       <span className="text-sm text-gray-500">
                         {displayCity(f.city)}, {stateCode}

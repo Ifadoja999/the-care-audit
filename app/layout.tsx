@@ -16,16 +16,24 @@ const body = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
+
 export const metadata: Metadata = {
   title: {
     template: '%s | The Care Audit',
-    default: 'The Care Audit — ALF Safety Grades & Inspection Reports',
+    default: 'The Care Audit — Assisted Living Facility Inspection Reports In Plain English',
   },
   description:
-    'Find safety grades and inspection reports for Assisted Living Facilities across all 50 states. Instantly searchable. Always free.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com'
-  ),
+    'Search inspection reports and violation histories for assisted living facilities in all 50 states. AI-generated summaries in plain English. Always free.',
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    siteName: 'The Care Audit',
+    type: 'website',
+    images: [{ url: `${siteUrl}/opengraph-image`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({
