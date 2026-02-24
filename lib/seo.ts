@@ -3,6 +3,8 @@ import type { Facility } from './types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
 const SITE_NAME = 'The Care Audit';
+const OG_IMAGE = `${SITE_URL}/opengraph-image`;
+const OG_IMAGE_ALT = 'The Care Audit — Assisted Living Facility Inspection Reports';
 
 // ─── State name lookup ────────────────────────────────────────────────────────
 
@@ -24,30 +26,56 @@ export function getStateName(stateCode: string): string {
   return STATE_NAMES[stateCode.toUpperCase()] ?? stateCode;
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function toTitleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+function ogImages(alt?: string) {
+  return [{ url: OG_IMAGE, width: 1200, height: 630, alt: alt ?? OG_IMAGE_ALT }];
+}
+
 // ─── Metadata helpers ─────────────────────────────────────────────────────────
 
 export function generateFacilityMetadata(facility: Facility): Metadata {
   const stateName = getStateName(facility.state);
   const city = toTitleCase(facility.city);
-  const title = `${facility.facility_name} Safety Grade & Violations`;
-  const description = `See the safety grade and violation history for ${facility.facility_name} in ${city}, ${stateName}. Grade: ${facility.safety_grade ?? 'N/A'}. ${facility.total_violations ?? 0} violations cited.`;
+  const name = toTitleCase(facility.facility_name);
+  const violations = facility.total_violations;
+  const violationText = violations === null
+    ? 'Inspection Data Pending'
+    : `${violations} Violation${violations === 1 ? '' : 's'}`;
+  const title = `${name} — ${violationText}`;
+  const description = facility.ai_summary
+    ? facility.ai_summary.slice(0, 155)
+    : violations === null
+      ? `View the listing for ${name} in ${city}, ${stateName}. Inspection data is being processed.`
+      : `See the inspection report and violation history for ${name} in ${city}, ${stateName}. ${violations} violation${violations === 1 ? '' : 's'} found.`;
   const url = `${SITE_URL}/${facility.slug}`;
+  const ogTitle = `${name} — ${violationText} | ${SITE_NAME}`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title,
-      description,
+      title: ogTitle,
+      description: facility.ai_summary ?? description,
       url,
       siteName: SITE_NAME,
       type: 'website',
+      images: ogImages(ogTitle),
     },
     twitter: {
-      card: 'summary',
-      title,
-      description,
+      card: 'summary_large_image',
+      title: ogTitle,
+      description: facility.ai_summary ?? description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -55,25 +83,28 @@ export function generateFacilityMetadata(facility: Facility): Metadata {
 export function generateStateMetadata(stateCode: string, facilityCount: number): Metadata {
   const stateName = getStateName(stateCode);
   const slug = stateName.toLowerCase().replace(/\s+/g, '-');
-  const title = `Assisted Living Facility Safety Grades in ${stateName}`;
-  const description = `Browse safety grades and inspection records for ${facilityCount.toLocaleString()} assisted living facilities in ${stateName}. Find violations, grades, and official state reports.`;
+  const title = `Assisted Living Facility Inspection Reports in ${stateName}`;
+  const description = `View inspection reports and violation data for ${facilityCount.toLocaleString()} assisted living facilities in ${stateName}.`;
   const url = `${SITE_URL}/${slug}`;
+  const ogTitle = `Assisted Living Facility Inspection Reports in ${stateName} | ${SITE_NAME}`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       url,
       siteName: SITE_NAME,
       type: 'website',
+      images: ogImages(ogTitle),
     },
     twitter: {
-      card: 'summary',
-      title,
+      card: 'summary_large_image',
+      title: ogTitle,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -87,25 +118,28 @@ export function generateCityMetadata(
   const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
   const citySlug = city.toLowerCase().replace(/\s+/g, '-');
   const cityTitle = toTitleCase(city);
-  const title = `Assisted Living Facilities in ${cityTitle}, ${stateCode} — Safety Grades`;
-  const description = `Compare safety grades and violations for ${facilityCount} assisted living facilities in ${cityTitle}, ${stateName}. Find the best care options with official inspection data.`;
+  const title = `Assisted Living Facilities in ${cityTitle}, ${stateCode}`;
+  const description = `Inspection reports and violation data for ${facilityCount} assisted living facilities in ${cityTitle}, ${stateName}.`;
   const url = `${SITE_URL}/${stateSlug}/${citySlug}`;
+  const ogTitle = `Assisted Living Facilities in ${cityTitle}, ${stateName} | ${SITE_NAME}`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       url,
       siteName: SITE_NAME,
       type: 'website',
+      images: ogImages(ogTitle),
     },
     twitter: {
-      card: 'summary',
-      title,
+      card: 'summary_large_image',
+      title: ogTitle,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -113,20 +147,43 @@ export function generateCityMetadata(
 // ─── Schema.org JSON-LD ───────────────────────────────────────────────────────
 
 export function localBusinessJsonLd(facility: Facility): object {
-  const stateName = getStateName(facility.state);
-  return {
+  const name = toTitleCase(facility.facility_name);
+
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: facility.facility_name,
+    '@type': ['LocalBusiness', 'LodgingBusiness'],
+    name,
     description: facility.ai_summary ?? undefined,
+    url: `${SITE_URL}/${facility.slug}`,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: facility.address,
+      streetAddress: facility.address ?? undefined,
       addressLocality: toTitleCase(facility.city),
       addressRegion: facility.state,
       addressCountry: 'US',
     },
-    url: `${SITE_URL}/${facility.slug}`,
+  };
+
+  if (facility.phone) {
+    schema.telephone = facility.phone;
+  }
+
+  return schema;
+}
+
+export function collectionPageJsonLd(opts: {
+  name: string;
+  description: string;
+  url: string;
+  count: number;
+}): object {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    numberOfItems: opts.count,
   };
 }
 
@@ -149,6 +206,8 @@ export function websiteSearchJsonLd(): object {
     '@type': 'WebSite',
     name: SITE_NAME,
     url: SITE_URL,
+    description:
+      'Search inspection reports and violation histories for assisted living facilities in all 50 states. AI-generated summaries in plain English. Always free.',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -158,14 +217,4 @@ export function websiteSearchJsonLd(): object {
       'query-input': 'required name=search_term_string',
     },
   };
-}
-
-// ─── Utility ──────────────────────────────────────────────────────────────────
-
-function toTitleCase(str: string): string {
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
 }

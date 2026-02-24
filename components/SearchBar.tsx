@@ -2,17 +2,27 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, MapPin, ChevronRight } from 'lucide-react';
 import { toTitleCase } from '@/lib/utils';
-import SafetyGradeBadge from './SafetyGradeBadge';
 
-interface SearchResult {
+interface FacilityResult {
+  type: 'facility';
   facility_name: string;
   city: string;
   state: string;
-  safety_grade: 'A' | 'B' | 'C' | 'F';
+  total_violations: number | null;
   slug: string;
 }
+
+interface StateResult {
+  type: 'state';
+  state_name: string;
+  state_code: string;
+  slug: string;
+  facility_count: number;
+}
+
+type SearchResult = FacilityResult | StateResult;
 
 interface Props {
   placeholder?: string;
@@ -46,7 +56,8 @@ export default function SearchBar({
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-        const data: SearchResult[] = await res.json();
+        const json = await res.json();
+        const data: SearchResult[] = json.results || json;
         setResults(data.slice(0, 8));
         setIsOpen(data.length > 0);
         setActiveIndex(-1);
@@ -81,6 +92,11 @@ export default function SearchBar({
     e.preventDefault();
     if (activeIndex >= 0 && activeIndex < results.length) {
       navigateToResult(results[activeIndex]);
+      return;
+    }
+    // Navigate to first result if available (state or facility)
+    if (results.length > 0) {
+      navigateToResult(results[0]);
       return;
     }
     const q = query.trim();
@@ -159,17 +175,43 @@ export default function SearchBar({
               onClick={() => navigateToResult(result)}
               className={`flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors ${
                 i === activeIndex ? 'bg-gray-50' : ''
-              }`}
+              } ${result.type === 'state' && i < results.length - 1 ? 'border-b border-gray-100' : ''}`}
             >
-              <SafetyGradeBadge grade={result.safety_grade} size="sm" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-900">
-                  {toTitleCase(result.facility_name)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {displayCity(result.city)}, {result.state}
-                </p>
-              </div>
+              {result.type === 'state' ? (
+                <>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {result.state_name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {result.facility_count > 0
+                        ? `View all ${result.facility_count.toLocaleString()} facilities`
+                        : 'Coming soon'}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                </>
+              ) : (
+                <>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">
+                      {toTitleCase(result.facility_name)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {displayCity(result.city)}, {result.state}
+                      {' \u00b7 '}
+                      {result.total_violations === null
+                        ? 'Data pending'
+                        : result.total_violations === 0
+                          ? 'No violations'
+                          : `${result.total_violations} violation${result.total_violations === 1 ? '' : 's'}`}
+                    </p>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

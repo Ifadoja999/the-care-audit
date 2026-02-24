@@ -2,7 +2,7 @@
 // All queries use the service role key via createServerClient().
 
 import { createServerClient } from './supabase';
-import type { Facility, FacilityWithViolations, StateStats, CityStats } from './types';
+import type { Facility, StateStats, CityStats } from './types';
 
 // Supabase PostgREST default limit is 1,000. Paginate for larger result sets.
 const PAGE_SIZE = 1000;
@@ -17,6 +17,7 @@ export async function getFacilitiesByState(stateCode: string): Promise<Facility[
       .from('facilities')
       .select('*')
       .eq('state', stateCode.toUpperCase())
+      .eq('facility_status', 'active')
       .order('city', { ascending: true })
       .order('facility_name', { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
@@ -44,7 +45,7 @@ export async function getFacilitiesByCity(
     .select('*')
     .eq('state', stateCode.toUpperCase())
     .ilike('city', city)
-    .order('safety_grade', { ascending: true })
+    .eq('facility_status', 'active')
     .order('facility_name', { ascending: true })
     .range(0, PAGE_SIZE - 1);
 
@@ -56,7 +57,7 @@ export async function getFacilitiesByCity(
   return (data as Facility[]) ?? [];
 }
 
-export async function getFacilityBySlug(slug: string): Promise<FacilityWithViolations | null> {
+export async function getFacilityBySlug(slug: string): Promise<Facility | null> {
   const supabase = createServerClient();
 
   const { data: facility, error: facilityError } = await supabase
@@ -70,20 +71,7 @@ export async function getFacilityBySlug(slug: string): Promise<FacilityWithViola
     return null;
   }
 
-  const { data: violations, error: violationsError } = await supabase
-    .from('violations')
-    .select('*')
-    .eq('facility_id', facility.id)
-    .order('date_cited', { ascending: false });
-
-  if (violationsError) {
-    console.error('getFacilityBySlug violations error:', violationsError.message);
-  }
-
-  return {
-    ...(facility as Facility),
-    violations: violations ?? [],
-  };
+  return facility as Facility;
 }
 
 export async function searchFacilities(query: string): Promise<Facility[]> {
@@ -94,9 +82,9 @@ export async function searchFacilities(query: string): Promise<Facility[]> {
 
   const { data, error } = await supabase
     .from('facilities')
-    .select('id, facility_name, city, state, safety_grade, slug, ai_summary')
+    .select('id, facility_name, city, state, total_violations, slug, ai_summary')
+    .eq('facility_status', 'active')
     .or(`facility_name.ilike.${q},city.ilike.${q}`)
-    .order('safety_grade', { ascending: true })
     .order('facility_name', { ascending: true })
     .limit(20);
 
@@ -117,6 +105,7 @@ export async function getAllStates(): Promise<StateStats[]> {
     const { data, error } = await supabase
       .from('facilities')
       .select('state')
+      .eq('facility_status', 'active')
       .order('state', { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
 
@@ -166,7 +155,6 @@ export async function getAllFacilitySlugs(): Promise<string[]> {
   return allSlugs;
 }
 
-// Future: Build admin dashboard for sponsor self-service management.
 export async function getFeaturedFacilities(
   stateCode: string,
   city?: string
@@ -178,7 +166,9 @@ export async function getFeaturedFacilities(
     .from('facilities')
     .select('*')
     .eq('state', stateCode.toUpperCase())
+    .eq('facility_status', 'active')
     .eq('is_sponsored', true)
+    .eq('sponsor_tier', 'featured_verified')
     .or(`sponsor_expiry_date.is.null,sponsor_expiry_date.gte.${today}`)
     .order('facility_name', { ascending: true });
 
@@ -206,6 +196,7 @@ export async function getAllCitiesByState(stateCode: string): Promise<CityStats[
       .from('facilities')
       .select('city')
       .eq('state', stateCode.toUpperCase())
+      .eq('facility_status', 'active')
       .order('city', { ascending: true })
       .range(from, from + PAGE_SIZE - 1);
 

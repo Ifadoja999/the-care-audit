@@ -10,23 +10,25 @@ import Footer from '@/components/Footer';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
 
 export const metadata: Metadata = {
-  title: 'The Care Audit — ALF Safety Grades & Inspection Reports',
+  title: 'The Care Audit — Assisted Living Facility Inspection Reports In Plain English',
   description:
-    'Find safety grades and inspection reports for Assisted Living Facilities across all 50 states. Instantly searchable. Always free.',
+    'Search inspection reports and violation histories for assisted living facilities in all 50 states. AI-generated summaries in plain English. Always free.',
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: 'The Care Audit — ALF Safety Grades & Inspection Reports',
+    title: 'The Care Audit — Assisted Living Facility Inspection Reports In Plain English',
     description:
-      'Find safety grades and inspection reports for Assisted Living Facilities across all 50 states. Instantly searchable. Always free.',
+      'Search inspection reports and violation histories for assisted living facilities in all 50 states. AI-generated summaries in plain English. Always free.',
     url: SITE_URL,
     siteName: 'The Care Audit',
     type: 'website',
+    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630, alt: 'The Care Audit — Assisted Living Facility Inspection Reports' }],
   },
   twitter: {
-    card: 'summary',
-    title: 'The Care Audit — ALF Safety Grades & Inspection Reports',
+    card: 'summary_large_image',
+    title: 'The Care Audit — Assisted Living Facility Inspection Reports In Plain English',
     description:
-      'Find safety grades and inspection reports for Assisted Living Facilities across all 50 states.',
+      'Search inspection reports and violation histories for assisted living facilities in all 50 states. AI-generated summaries in plain English. Always free.',
+    images: [`${SITE_URL}/opengraph-image`],
   },
 };
 
@@ -53,29 +55,49 @@ export default async function HomePage() {
       />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-navy via-navy-light to-navy-dark px-4 py-24 text-white">
-        {/* Subtle radial glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(201,147,62,0.12),transparent_70%)]" />
+      <section className="relative z-10 overflow-x-clip bg-gradient-to-br from-[#2563EB] to-[#3B82F6] px-4 py-16 lg:py-20">
+        {/* Radial glow */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
+        {/* Decorative circles */}
+        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/5" />
+        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full bg-white/5" />
 
-        <div className="relative mx-auto max-w-3xl text-center animate-fade-in">
-          <Image
-            src="/images/logo.png"
-            alt="The Care Audit logo"
-            width={88}
-            height={88}
-            className="mx-auto mb-8 h-22 w-auto drop-shadow-lg"
-            priority
-          />
-          <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-[3.4rem]">
-            Find the Safety Grade for Any
-            <br className="hidden sm:block" />
-            Assisted Living Facility
-          </h1>
-          <p className="mt-5 text-lg leading-relaxed text-blue-100/90">
-            Inspection data for all 50 states. Instantly searchable. Always free.
-          </p>
-          <div className="mt-10 flex justify-center">
-            <SearchBar />
+        <div className="relative mx-auto max-w-6xl animate-fade-in">
+          <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
+            {/* Left: Text + Search */}
+            <div className="flex-1 text-center lg:text-left">
+              <Image
+                src="/images/logo.png"
+                alt="The Care Audit logo"
+                width={80}
+                height={80}
+                className="mx-auto mb-6 h-20 w-auto drop-shadow-[0_2px_10px_rgba(255,255,255,0.3)] lg:mx-0"
+                priority
+              />
+              <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.8rem]">
+                Assisted Living Inspection Reports
+                <br className="hidden sm:block" />
+                — In Plain English
+              </h1>
+              <p className="mt-4 text-base leading-relaxed text-blue-100 sm:text-lg">
+                Inspection data for all 50 states. Instantly searchable. Always free.
+              </p>
+              <div className="mt-8">
+                <SearchBar />
+              </div>
+            </div>
+
+            {/* Right: Hero Image */}
+            <div className="flex-shrink-0 lg:w-[420px]">
+              <Image
+                src="/images/hero-seniors.jpg"
+                alt="Happy seniors enjoying a bright, modern assisted living community"
+                width={800}
+                height={600}
+                className="h-auto w-full rounded-2xl shadow-2xl object-cover ring-4 ring-white/20"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -112,8 +134,8 @@ export default async function HomePage() {
               },
               {
                 step: '2',
-                title: 'View Grade',
-                desc: 'See the safety grade (A\u2013F) calculated from the most recent state inspection.',
+                title: 'View Violations',
+                desc: 'See the number of violations found in the most recent state inspection.',
                 icon: (
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
@@ -123,7 +145,7 @@ export default async function HomePage() {
               {
                 step: '3',
                 title: 'Read Report',
-                desc: 'Review the full violation history and an AI plain-language summary of what it means.',
+                desc: 'Review the AI-generated plain English summary and link to the official state inspection report.',
                 icon: (
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
