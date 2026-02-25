@@ -16,6 +16,9 @@ import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 import ShowMoreFeatured from '@/components/ShowMoreFeatured';
 
+// Revalidate state pages every 24 hours so updated pipeline data is reflected
+export const revalidate = 86400;
+
 interface Props {
   params: Promise<{ state: string }>;
 }
