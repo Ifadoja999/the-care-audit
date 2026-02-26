@@ -8,7 +8,7 @@ import {
   slugToCity,
 } from '@/lib/states';
 import { generateCityMetadata, breadcrumbJsonLd, collectionPageJsonLd } from '@/lib/seo';
-import { toTitleCase } from '@/lib/utils';
+import { toTitleCase, displayCityFromDb } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -33,8 +33,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { state: stateSlug, city: citySlug } = await params;
   const stateCode = slugToStateCode(stateSlug);
   if (!stateCode) return {};
-  const cityName = slugToCity(citySlug);
-  const facilities = await getFacilitiesByCity(stateCode, cityName);
+  const cityFromSlug = slugToCity(citySlug);
+  const facilities = await getFacilitiesByCity(stateCode, cityFromSlug);
+  const cityName = facilities[0]?.city
+    ? displayCityFromDb(facilities[0].city)
+    : cityFromSlug;
   return generateCityMetadata(stateCode, cityName, facilities.length);
 }
 
@@ -43,14 +46,19 @@ export default async function CityPage({ params }: Props) {
   const stateCode = slugToStateCode(stateSlug);
   if (!stateCode) notFound();
 
-  const cityName = slugToCity(citySlug);
+  const cityFromSlug = slugToCity(citySlug);
   const stateName = stateCodeToName(stateCode);
 
   const [facilities, featured] = await Promise.all([
-    getFacilitiesByCity(stateCode, cityName),
-    getFeaturedFacilities(stateCode, cityName),
+    getFacilitiesByCity(stateCode, cityFromSlug),
+    getFeaturedFacilities(stateCode, cityFromSlug),
   ]);
   if (facilities.length === 0) notFound();
+
+  // Use actual DB city name (preserves hyphens like "KAILUA-KONA") for display
+  const cityName = facilities[0]?.city
+    ? displayCityFromDb(facilities[0].city)
+    : cityFromSlug;
 
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
