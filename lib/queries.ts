@@ -40,11 +40,13 @@ export async function getFacilitiesByCity(
   city: string
 ): Promise<Facility[]> {
   const supabase = createServerClient();
+  // Replace spaces with single-char wildcard so "Kailua Kona" matches "KAILUA-KONA"
+  const cityPattern = city.replace(/\s/g, '_');
   const { data, error } = await supabase
     .from('facilities')
     .select('*')
     .eq('state', stateCode.toUpperCase())
-    .ilike('city', city)
+    .ilike('city', cityPattern)
     .eq('facility_status', 'active')
     .order('facility_name', { ascending: true })
     .range(0, PAGE_SIZE - 1);
@@ -173,7 +175,8 @@ export async function getFeaturedFacilities(
     .order('facility_name', { ascending: true });
 
   if (city) {
-    query = query.ilike('city', city);
+    // Replace spaces with single-char wildcard so "Kailua Kona" matches "KAILUA-KONA"
+    query = query.ilike('city', city.replace(/\s/g, '_'));
   }
 
   const { data, error } = await query;

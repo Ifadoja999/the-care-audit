@@ -21,3 +21,19 @@ export function toTitleCase(name: string): string {
     })
     .join(' ');
 }
+
+/**
+ * Convert a DB city name (e.g. "KAILUA-KONA", "HONOLULU") to display form.
+ * Preserves hyphens while title-casing each word segment.
+ */
+export function displayCityFromDb(city: string): string {
+  if (!city) return '';
+  return city
+    .toLowerCase()
+    .split(/(-|\s)/)
+    .map(segment => {
+      if (segment === '-' || segment === ' ') return segment;
+      return segment.charAt(0).toUpperCase() + segment.slice(1);
+    })
+    .join('');
+}
