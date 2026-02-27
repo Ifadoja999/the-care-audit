@@ -6,6 +6,7 @@ export const STATE_INFO: Record<string, { name: string; slug: string }> = {
   CA: { name: 'California',     slug: 'california' },
   CO: { name: 'Colorado',       slug: 'colorado' },
   CT: { name: 'Connecticut',    slug: 'connecticut' },
+  DC: { name: 'District of Columbia', slug: 'district-of-columbia' },
   DE: { name: 'Delaware',       slug: 'delaware' },
   FL: { name: 'Florida',        slug: 'florida' },
   GA: { name: 'Georgia',        slug: 'georgia' },
