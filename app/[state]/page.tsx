@@ -126,7 +126,7 @@ export default async function StatePage({ params }: Props) {
               Featured Facilities
             </h2>
             {(() => {
-              const MAX_VISIBLE = 4;
+              const MAX_VISIBLE = 5;
               const visible = featured.slice(0, MAX_VISIBLE);
               const overflow = featured.slice(MAX_VISIBLE);
 

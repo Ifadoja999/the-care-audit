@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getStripe } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase';
 import { sendTier1Welcome, sendTier2Welcome, sendTier3Welcome } from '@/lib/emails';
 import Stripe from 'stripe';
+
+function revalidateFacility(slug: string | null | undefined) {
+  if (!slug) return;
+  revalidatePath(`/${slug}`);
+  const parts = slug.split('/');
+  if (parts.length >= 2) {
+    revalidatePath(`/${parts[0]}/${parts[1]}`);
+    revalidatePath(`/${parts[0]}`);
+  }
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -14,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = getStripe().webhooks.constructEvent(body, sig, (process.env.STRIPE_WEBHOOK_SECRET || '').trim());
   } catch (err) {
     console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -52,12 +63,15 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Get facility details for email
+      // Get facility details for email and revalidation
       const { data: facility } = await supabase
         .from('facilities')
-        .select('facility_name, city, state')
+        .select('facility_name, city, state, slug')
         .eq('id', facilityId)
         .single();
+
+      // Revalidate cached pages
+      revalidateFacility(facility?.slug);
 
       if (customerEmail && facility) {
         try {
@@ -132,6 +146,9 @@ export async function POST(req: NextRequest) {
           const filePaths = files.map(f => `${folderPath}/${f.name}`);
           await supabase.storage.from('facility-photos').remove(filePaths);
         }
+
+        // Revalidate cached pages
+        revalidateFacility(facility.slug);
       }
       break;
     }
@@ -145,15 +162,19 @@ export async function POST(req: NextRequest) {
       const priceId = subscription.items.data[0]?.price?.id;
       let newTier: string | null = null;
 
-      if (priceId === process.env.STRIPE_PRICE_FEATURED) newTier = 'featured_verified';
-      else if (priceId === process.env.STRIPE_PRICE_VERIFIED) newTier = 'verified_profile';
-      else if (priceId === process.env.STRIPE_PRICE_RESPONSE) newTier = 'facility_response';
+      if (priceId === (process.env.STRIPE_PRICE_FEATURED || '').trim()) newTier = 'featured_verified';
+      else if (priceId === (process.env.STRIPE_PRICE_VERIFIED || '').trim()) newTier = 'verified_profile';
+      else if (priceId === (process.env.STRIPE_PRICE_RESPONSE || '').trim()) newTier = 'facility_response';
 
       if (newTier) {
-        await supabase
+        const { data: updatedFacility } = await supabase
           .from('facilities')
           .update({ sponsor_tier: newTier })
-          .eq('id', facilityId);
+          .eq('id', facilityId)
+          .select('slug')
+          .single();
+
+        revalidateFacility(updatedFacility?.slug);
       }
       break;
     }

@@ -25,6 +25,7 @@ export interface Facility {
   facility_response?: string | null;
   onboarding_token?: string | null;
   onboarding_completed?: boolean;
+  tour_url?: string | null;
   // Outreach: internal only, never displayed on site
   outreach_email?: string | null;
   outreach_website?: string | null;

@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'The Care Audit <noreply@thecareaudit.com>';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com').trim().replace(/\/+$/, '');
 
 function emailLayout(content: string): string {
   return `<!DOCTYPE html>
@@ -60,7 +60,7 @@ export async function sendTier1Welcome(params: {
 <li>Facility description</li>
 </ul>
 ${ctaButton('Complete Your Profile', onboardUrl)}
-<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/api/stripe/portal" style="color:#2563EB">Manage subscription</a></p>`;
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/manage-subscription" style="color:#2563EB">Manage subscription</a></p>`;
 
   return resend.emails.send({
     from: FROM_EMAIL,
@@ -87,7 +87,7 @@ export async function sendTier2Welcome(params: {
 <li>Facility description</li>
 </ul>
 ${ctaButton('Complete Your Profile', onboardUrl)}
-<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/api/stripe/portal" style="color:#2563EB">Manage subscription</a></p>`;
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/manage-subscription" style="color:#2563EB">Manage subscription</a></p>`;
 
   return resend.emails.send({
     from: FROM_EMAIL,
@@ -109,7 +109,7 @@ export async function sendTier3Welcome(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">You can now post an official response on your facility&rsquo;s profile page. Your response will appear below the inspection summary, giving families your perspective.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">You have up to 1,000 characters to share corrective actions taken, context about violations, or updates about your facility.</p>
 ${ctaButton('Write Your Response', responseUrl)}
-<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/api/stripe/portal" style="color:#2563EB">Manage subscription</a></p>`;
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/manage-subscription" style="color:#2563EB">Manage subscription</a></p>`;
 
   return resend.emails.send({
     from: FROM_EMAIL,
@@ -158,7 +158,7 @@ export async function sendDowngradeEmail(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Eligibility for Featured Verified and Verified Profile listings requires 3 or fewer violations from the most recent state inspection.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your listing will transition to our Facility Response plan ($49/month) on your next billing cycle. With Facility Response, you can post an official response on your facility&rsquo;s profile page and update your phone number and address.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">If you&rsquo;d prefer to cancel your subscription entirely, you can do so anytime through your subscription management page.</p>
-${ctaButton('Manage Your Subscription', `${SITE_URL}/api/stripe/portal`)}
+${ctaButton('Manage Your Subscription', `${SITE_URL}/manage-subscription`)}
 <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">If your violation count decreases to 3 or fewer following a future inspection, you&rsquo;ll be eligible to upgrade back to Featured Verified or Verified Profile.</p>`;
 
   return resend.emails.send({
@@ -243,7 +243,7 @@ export async function sendPriceChangeAnnouncement(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">We&rsquo;re raising prices for new customers. Your current rate is locked in for 12 months from your sign-up date. No action needed on your part.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px"><strong>Your current plan:</strong> ${params.currentTier} at $${params.currentRate}/month</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Thank you for being an early subscriber to The Care Audit.</p>
-<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/api/stripe/portal" style="color:#2563EB">Manage subscription</a></p>`;
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">Need to manage your subscription? <a href="${SITE_URL}/manage-subscription" style="color:#2563EB">Manage subscription</a></p>`;
 
   return resend.emails.send({
     from: FROM_EMAIL,
@@ -264,7 +264,7 @@ export async function sendGrandfatheredReminder(params: {
 <h2 style="margin:0 0 16px;color:#111827;font-size:22px">Your grandfathered rate expires next month</h2>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your grandfathered rate of <strong>$${params.currentRate}/month</strong> for <strong>${params.facilityName}</strong> expires next month.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your new rate will be <strong>$${params.newRate}/month</strong> starting ${params.expiryDate}. You can cancel anytime before then.</p>
-${ctaButton('Manage Your Subscription', `${SITE_URL}/api/stripe/portal`)}`;
+${ctaButton('Manage Your Subscription', `${SITE_URL}/manage-subscription`)}`;
 
   return resend.emails.send({
     from: FROM_EMAIL,

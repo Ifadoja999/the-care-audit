@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getFacilitiesByCity, getFeaturedFacilities } from '@/lib/queries';
+import { getFacilitiesByCity, getFeaturedFacilities, resolveCity } from '@/lib/queries';
 import {
   slugToStateCode,
   stateCodeToName,
@@ -15,9 +15,10 @@ import Footer from '@/components/Footer';
 import ShowMoreFeatured from '@/components/ShowMoreFeatured';
 import CityFacilitiesTable from '@/components/CityFacilitiesTable';
 
-// ISR: pages generate on first visit, then revalidate every 24 hours
+// ISR: pages generate on first visit, then revalidate every 7 days
+// Data only changes monthly (pipeline runs), so 7-day interval reduces ISR writes ~7x
 export const dynamicParams = true;
-export const revalidate = 86400;
+export const revalidate = 604800;
 
 interface Props {
   params: Promise<{ state: string; city: string }>;
@@ -33,8 +34,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { state: stateSlug, city: citySlug } = await params;
   const stateCode = slugToStateCode(stateSlug);
   if (!stateCode) return {};
-  const cityFromSlug = slugToCity(citySlug);
-  const facilities = await getFacilitiesByCity(stateCode, cityFromSlug);
+  let cityFromSlug = slugToCity(citySlug);
+  let facilities = await getFacilitiesByCity(stateCode, cityFromSlug);
+
+  // Fallback: resolve city by slug match
+  if (facilities.length === 0) {
+    const dbCity = await resolveCity(stateCode, citySlug);
+    if (dbCity) {
+      facilities = await getFacilitiesByCity(stateCode, dbCity);
+      cityFromSlug = dbCity;
+    }
+  }
+
   const cityName = facilities[0]?.city
     ? displayCityFromDb(facilities[0].city)
     : cityFromSlug;
@@ -46,13 +57,28 @@ export default async function CityPage({ params }: Props) {
   const stateCode = slugToStateCode(stateSlug);
   if (!stateCode) notFound();
 
-  const cityFromSlug = slugToCity(citySlug);
   const stateName = stateCodeToName(stateCode);
 
-  const [facilities, featured] = await Promise.all([
+  // Try simple slug→city conversion first (fast path: works for most cities)
+  let cityFromSlug = slugToCity(citySlug);
+  let [facilities, featured] = await Promise.all([
     getFacilitiesByCity(stateCode, cityFromSlug),
     getFeaturedFacilities(stateCode, cityFromSlug),
   ]);
+
+  // Fallback: resolve city by slug match (handles apostrophes, periods, etc.
+  // where the ilike round-trip fails, e.g. LEE'S SUMMIT, O'FALLON, Mt. Juliet)
+  if (facilities.length === 0) {
+    const dbCity = await resolveCity(stateCode, citySlug);
+    if (dbCity) {
+      cityFromSlug = dbCity;
+      [facilities, featured] = await Promise.all([
+        getFacilitiesByCity(stateCode, dbCity),
+        getFeaturedFacilities(stateCode, dbCity),
+      ]);
+    }
+  }
+
   if (facilities.length === 0) notFound();
 
   // Use actual DB city name (preserves hyphens like "KAILUA-KONA") for display
@@ -120,7 +146,7 @@ export default async function CityPage({ params }: Props) {
               Featured Facilities
             </h2>
             {(() => {
-              const MAX_VISIBLE = 4;
+              const MAX_VISIBLE = 5;
               const visible = featured.slice(0, MAX_VISIBLE);
               const overflow = featured.slice(MAX_VISIBLE);
 

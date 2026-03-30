@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/api/',
     },
-    sitemap: 'https://www.thecareaudit.com/sitemap.xml',
+    sitemap: 'https://www.thecareaudit.com/sitemap-index.xml',
   };
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { Facility } from './types';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com').trim().replace(/\/+$/, '');
 const SITE_NAME = 'The Care Audit';
 const OG_IMAGE = `${SITE_URL}/opengraph-image`;
 const OG_IMAGE_ALT = 'The Care Audit — Assisted Living Facility Inspection Reports';
@@ -47,14 +47,15 @@ export function generateFacilityMetadata(facility: Facility): Metadata {
   const city = toTitleCase(facility.city);
   const name = toTitleCase(facility.facility_name);
   const violations = facility.total_violations;
-  const violationText = violations === null
-    ? 'Inspection Data Pending'
+  const hasViolationData = violations !== null;
+  const violationText = !hasViolationData
+    ? `Licensed Assisted Living in ${city}, ${stateName}`
     : `${violations} Violation${violations === 1 ? '' : 's'}`;
   const title = `${name} — ${violationText}`;
   const description = facility.ai_summary
     ? facility.ai_summary.slice(0, 155)
-    : violations === null
-      ? `View the listing for ${name} in ${city}, ${stateName}. Inspection data is being processed.`
+    : !hasViolationData
+      ? `${name} is a state-licensed assisted living facility in ${city}, ${stateName}. View facility details, licensing information, address, and contact information.`
       : `See the inspection report and violation history for ${name} in ${city}, ${stateName}. ${violations} violation${violations === 1 ? '' : 's'} found.`;
   const url = `${SITE_URL}/${facility.slug}`;
   const ogTitle = `${name} — ${violationText} | ${SITE_NAME}`;

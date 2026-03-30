@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@/lib/supabase';
 
 export async function GET(
@@ -10,7 +11,7 @@ export async function GET(
 
   const { data, error } = await supabase
     .from('facilities')
-    .select('id, facility_name, phone, address, website_url, contact_email, facility_description, sponsor_tier, slug, city, state, is_sponsored')
+    .select('id, facility_name, phone, address, website_url, contact_email, facility_description, sponsor_tier, slug, city, state, is_sponsored, tour_url')
     .eq('onboarding_token', token)
     .eq('is_sponsored', true)
     .single();
@@ -33,7 +34,7 @@ export async function POST(
   // Verify token is valid
   const { data: facility, error: lookupError } = await supabase
     .from('facilities')
-    .select('id, sponsor_tier')
+    .select('id, sponsor_tier, slug')
     .eq('onboarding_token', token)
     .eq('is_sponsored', true)
     .single();
@@ -54,6 +55,7 @@ export async function POST(
     const desc = body.facility_description;
     updateData.facility_description = desc ? desc.slice(0, 500) : null;
   }
+  if (body.tour_url !== undefined) updateData.tour_url = body.tour_url;
 
   const { error: updateError } = await supabase
     .from('facilities')
@@ -63,6 +65,16 @@ export async function POST(
   if (updateError) {
     console.error('Onboard update error:', updateError);
     return NextResponse.json({ error: 'Failed to save changes.' }, { status: 500 });
+  }
+
+  // Revalidate ISR-cached pages so changes appear immediately
+  if (facility.slug) {
+    revalidatePath(`/${facility.slug}`);
+    const slugParts = facility.slug.split('/');
+    if (slugParts.length >= 2) {
+      revalidatePath(`/${slugParts[0]}/${slugParts[1]}`); // city page
+      revalidatePath(`/${slugParts[0]}`); // state page
+    }
   }
 
   return NextResponse.json({ success: true });

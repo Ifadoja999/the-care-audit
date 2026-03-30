@@ -7,8 +7,8 @@ import SearchBar from '@/components/SearchBar';
 import StateCard from '@/components/StateCard';
 import Footer from '@/components/Footer';
 
-// Revalidate homepage every 24 hours so new states appear automatically
-export const revalidate = 86400;
+// Revalidate homepage every hour so new states appear quickly
+export const revalidate = 3600;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
 

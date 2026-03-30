@@ -2,6 +2,7 @@
 // All queries use the service role key via createServerClient().
 
 import { createServerClient } from './supabase';
+import { cityToSlug } from './states';
 import type { Facility, StateStats, CityStats } from './types';
 
 // Supabase PostgREST default limit is 1,000. Paginate for larger result sets.
@@ -187,6 +188,47 @@ export async function getFeaturedFacilities(
   }
 
   return (data as Facility[]) ?? [];
+}
+
+/**
+ * Resolve a city URL slug to the exact DB city name.
+ * Handles the round-trip correctly even when DB city names contain
+ * apostrophes, periods, or other characters that cityToSlug strips.
+ *
+ * Example: slug "lees-summit" → DB city "LEE'S SUMMIT"
+ */
+export async function resolveCity(
+  stateCode: string,
+  slug: string
+): Promise<string | null> {
+  const supabase = createServerClient();
+  const allData: { city: string }[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('facilities')
+      .select('city')
+      .eq('state', stateCode.toUpperCase())
+      .eq('facility_status', 'active')
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error || !data || data.length === 0) break;
+    allData.push(...data);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  const seen = new Set<string>();
+  for (const row of allData) {
+    const c = row.city?.trim();
+    if (c && !seen.has(c)) {
+      seen.add(c);
+      if (cityToSlug(c) === slug) return c;
+    }
+  }
+
+  return null;
 }
 
 export async function getAllCitiesByState(stateCode: string): Promise<CityStats[]> {

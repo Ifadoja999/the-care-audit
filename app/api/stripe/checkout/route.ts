@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Price not configured for this tier' }, { status: 500 });
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com';
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com').trim().replace(/\/+$/, '');
 
     const session = await getStripe().checkout.sessions.create({
       mode: 'subscription',
@@ -66,7 +66,6 @@ export async function POST(req: NextRequest) {
       },
       success_url: `${siteUrl}/for-facilities?success=true`,
       cancel_url: `${siteUrl}/for-facilities?canceled=true`,
-      customer_email: undefined, // Stripe collects email during checkout
       allow_promotion_codes: true,
     });
 

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { X, Upload, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -18,10 +19,55 @@ interface FacilityData {
   slug: string;
   city: string;
   state: string;
+  tour_url?: string | null;
+}
+
+interface PhotoSlot {
+  url: string | null;
+  uploading: boolean;
 }
 
 function toTitleCase(str: string): string {
   return str.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/**
+ * Compress an image file client-side: resize to max 1200px width, output as 80% JPEG.
+ * Returns a Blob ready for upload.
+ */
+async function compressImage(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX_WIDTH = 1200;
+      const MAX_HEIGHT = 1200;
+      let { width, height } = img;
+
+      if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas not supported')); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Compression failed'));
+        },
+        'image/jpeg',
+        0.8
+      );
+    };
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 export default function OnboardPage() {
@@ -31,6 +77,7 @@ export default function OnboardPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form fields
   const [phone, setPhone] = useState('');
@@ -39,6 +86,14 @@ export default function OnboardPage() {
   const [contactEmail, setContactEmail] = useState('');
   const [description, setDescription] = useState('');
   const [tourUrl, setTourUrl] = useState('');
+
+  // Photo management — 4 slots
+  const [photos, setPhotos] = useState<PhotoSlot[]>([
+    { url: null, uploading: false },
+    { url: null, uploading: false },
+    { url: null, uploading: false },
+    { url: null, uploading: false },
+  ]);
 
   useEffect(() => {
     async function loadFacility() {
@@ -52,11 +107,101 @@ export default function OnboardPage() {
         setWebsiteUrl(data.website_url || '');
         setContactEmail(data.contact_email || '');
         setDescription(data.facility_description || '');
+        setTourUrl(data.tour_url || '');
+
+        // Load existing photos from Supabase Storage
+        if (data.sponsor_tier === 'featured_verified' && data.slug) {
+          const existingPhotos: PhotoSlot[] = [];
+          for (let i = 1; i <= 4; i++) {
+            const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/facility-photos/${data.slug}/${i}.jpg`;
+            try {
+              const check = await fetch(url, { method: 'HEAD' });
+              existingPhotos.push({
+                url: check.ok ? `${url}?t=${Date.now()}` : null,
+                uploading: false,
+              });
+            } catch {
+              existingPhotos.push({ url: null, uploading: false });
+            }
+          }
+          setPhotos(existingPhotos);
+        }
       } catch { setError('Failed to load facility data.'); }
       finally { setLoading(false); }
     }
     loadFacility();
   }, [token]);
+
+  const handlePhotoUpload = async (file: File, index: number) => {
+    if (!facility) return;
+
+    // Update slot to show uploading state
+    setPhotos(prev => prev.map((p, i) => i === index ? { ...p, uploading: true } : p));
+
+    try {
+      // Compress image client-side (resize to 1200px, 80% JPEG quality)
+      const compressed = await compressImage(file);
+
+      const formData = new FormData();
+      formData.append('file', compressed, `${index + 1}.jpg`);
+      formData.append('index', String(index + 1));
+
+      const res = await fetch(`/api/onboard/${token}/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setPhotos(prev => prev.map((p, i) =>
+          i === index ? { url: `${data.url}?t=${Date.now()}`, uploading: false } : p
+        ));
+      } else {
+        alert(data.error || 'Failed to upload photo.');
+        setPhotos(prev => prev.map((p, i) => i === index ? { ...p, uploading: false } : p));
+      }
+    } catch {
+      alert('Failed to upload photo. Please try again.');
+      setPhotos(prev => prev.map((p, i) => i === index ? { ...p, uploading: false } : p));
+    }
+  };
+
+  const handlePhotoDelete = async (index: number) => {
+    if (!facility || !confirm('Remove this photo?')) return;
+
+    try {
+      const res = await fetch(`/api/onboard/${token}/upload?index=${index + 1}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setPhotos(prev => prev.map((p, i) =>
+          i === index ? { url: null, uploading: false } : p
+        ));
+      }
+    } catch {
+      alert('Failed to remove photo.');
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    // Find first empty slot for each file
+    const filesToUpload = Array.from(files);
+    for (const file of filesToUpload) {
+      const emptyIndex = photos.findIndex(p => !p.url && !p.uploading);
+      if (emptyIndex === -1) {
+        alert('All 4 photo slots are full. Remove a photo to add a new one.');
+        break;
+      }
+      await handlePhotoUpload(file, emptyIndex);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +231,7 @@ export default function OnboardPage() {
   };
 
   const isTier1 = facility?.sponsor_tier === 'featured_verified';
+  const hasEmptySlot = photos.some(p => !p.url && !p.uploading);
 
   if (loading) {
     return (
@@ -193,42 +339,86 @@ export default function OnboardPage() {
             </div>
           )}
 
-          {/* Photo upload placeholder for Tier 1 */}
+          {/* Photo upload — Tier 1 only */}
           {isTier1 && (
             <div>
               <label className="block text-sm font-medium text-gray-700">Facility Photos (up to 4)</label>
-              <p className="mt-0.5 text-xs text-gray-500">JPG, PNG, or WebP. Max 2MB each.</p>
-              <div className="mt-2 rounded-xl border-2 border-dashed border-gray-300 p-8 text-center">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  multiple
-                  onChange={async (e) => {
-                    const files = e.target.files;
-                    if (!files || !facility) return;
-                    const maxFiles = 4;
-                    const filesToUpload = Array.from(files).slice(0, maxFiles);
-                    for (let i = 0; i < filesToUpload.length; i++) {
-                      const file = filesToUpload[i];
-                      if (file.size > 2 * 1024 * 1024) {
-                        alert(`${file.name} exceeds 2MB limit.`);
-                        continue;
-                      }
-                      const slugParts = facility.slug.split('/');
-                      const path = `${slugParts[0]}/${slugParts[1]}/${slugParts[2]}/${i + 1}.jpg`;
-                      try {
-                        await fetch(`/api/onboard/${token}/upload`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ path, fileName: file.name }),
-                        });
-                      } catch { /* handled by form */ }
-                    }
-                  }}
-                  className="text-sm text-gray-500"
-                />
-                <p className="mt-2 text-sm text-gray-400">Drag and drop or click to upload</p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                JPG, PNG, or WebP. Photos are automatically compressed and resized for optimal display.
+              </p>
+
+              {/* Photo grid showing existing and empty slots */}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {photos.map((photo, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50"
+                  >
+                    {photo.uploading ? (
+                      <div className="flex h-full items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                      </div>
+                    ) : photo.url ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt={`Photo ${i + 1}`}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handlePhotoDelete(i)}
+                          className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
+                          title="Remove photo"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        <span className="absolute bottom-2 left-2 rounded-md bg-black/50 px-2 py-0.5 text-xs text-white">
+                          {i === 0 ? 'Primary' : `Photo ${i + 1}`}
+                        </span>
+                      </>
+                    ) : (
+                      <label className="flex h-full cursor-pointer flex-col items-center justify-center gap-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-500">
+                        <Upload className="h-6 w-6" />
+                        <span className="text-xs">{i === 0 ? 'Primary photo' : `Photo ${i + 1}`}</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handlePhotoUpload(file, i);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                ))}
               </div>
+
+              {/* Bulk upload button */}
+              {hasEmptySlot && (
+                <div className="mt-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Add photos
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     const customer = customers.data[0];
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com';
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thecareaudit.com').trim().replace(/\/+$/, '');
 
     const portalSession = await getStripe().billingPortal.sessions.create({
       customer: customer.id,

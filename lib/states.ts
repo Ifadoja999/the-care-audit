@@ -67,9 +67,11 @@ export function stateCodeToName(code: string): string {
   return STATE_INFO[code.toUpperCase()]?.name ?? code;
 }
 
-/** "PLANT CITY" or "Tampa" → "plant-city", "KAILUA-KONA" → "kailua-kona" */
+/** "PLANT CITY" → "plant-city", "KAILUA-KONA" → "kailua-kona", "L'ANSE" → "lanse" */
 export function cityToSlug(city: string): string {
   return city
+    .replace(/&#\d+;/g, '')   // strip HTML entities like &#39;
+    .replace(/&\w+;/g, '')    // strip named HTML entities like &amp;
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()

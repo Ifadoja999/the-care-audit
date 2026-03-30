@@ -19,9 +19,10 @@ import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 
-// ISR: pages generate on first visit, then revalidate every 24 hours
+// ISR: pages generate on first visit, then revalidate every 7 days
+// Data only changes monthly (pipeline runs), so 7-day interval reduces ISR writes ~7x
 export const dynamicParams = true;
-export const revalidate = 86400;
+export const revalidate = 604800;
 
 interface Props {
   params: Promise<{ state: string; city: string; facility: string }>;
@@ -264,10 +265,10 @@ export default async function FacilityPage({ params }: Props) {
         )}
 
         {/* 5. Schedule a Tour — Tier 1 only */}
-        {isTier1 && (
+        {isTier1 && (facility.tour_url || facility.website_url) && (
           <div className="mt-6">
             <a
-              href={facility.website_url || '#'}
+              href={facility.tour_url || facility.website_url || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-amber-600 hover:shadow-md"
@@ -283,8 +284,11 @@ export default async function FacilityPage({ params }: Props) {
           <div className="flex flex-col items-center text-center">
             {facility.total_violations === null ? (
               <>
-                <HelpCircle className="h-10 w-10 text-gray-300" />
-                <p className="mt-3 text-xl font-semibold text-gray-600">Inspection data not yet available</p>
+                <CheckCircle2 className="h-10 w-10 text-gray-400" />
+                <p className="mt-3 text-xl font-semibold text-gray-600">State-Licensed Assisted Living Facility</p>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-gray-500">
+                  {toTitleCase(facility.facility_name)} is a licensed assisted living facility in {cityName}, {stateName}. State inspection reports for this facility will be displayed here as they become available from the {stateName} health department.
+                </p>
               </>
             ) : facility.total_violations === 0 ? (
               <>
@@ -324,6 +328,33 @@ export default async function FacilityPage({ params }: Props) {
               Always refer to the official inspection report linked below for complete and
               authoritative information.
             </p>
+          </div>
+        )}
+
+        {/* 7b. Facility Details — shown when no meaningful AI summary (directory-only states) */}
+        {(!facility.ai_summary || facility.total_violations === null) && (
+          <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
+              About {toTitleCase(facility.facility_name)}
+            </h2>
+            <p className="mt-2 leading-relaxed text-gray-700">
+              {toTitleCase(facility.facility_name)} is a licensed {facility.facility_type || 'assisted living facility'} located in {cityName}, {stateName}.
+              {facility.licensed_capacity != null && facility.licensed_capacity > 0 && (
+                <> The facility is licensed to serve up to {facility.licensed_capacity} residents.</>
+              )}
+              {facility.address && (
+                <> It is located at {facility.address}.</>
+              )}
+            </p>
+            <p className="mt-3 leading-relaxed text-gray-700">
+              The Care Audit collects and organizes publicly available state inspection data for assisted living facilities across all 50 states. Inspection reports for this facility, when available from the {stateName} state health department, will include violation counts and a plain English summary of any findings.
+            </p>
+            {facility.phone && (
+              <p className="mt-3 text-sm text-gray-600">
+                To learn more about this facility, you can contact them directly at{' '}
+                <a href={`tel:${facility.phone}`} className="text-blue-600 hover:underline">{facility.phone}</a>.
+              </p>
+            )}
           </div>
         )}
 

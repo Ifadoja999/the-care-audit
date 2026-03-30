@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "import-in-the-middle": "1.11.0",
+    "playwright": "1.58.2"
+  },
+  "devDependencies": {
+  },
+  "name": "the-care-audit",
+  "peerDependencies": {
+  },
+  "private": true,
+  "scripts": {
+  },
+  "trustedDependencies": [
+    "import-in-the-middle",
+    "playwright"
+  ],
+  "version": "0.1.0"
+}
