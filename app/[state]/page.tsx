@@ -9,8 +9,9 @@ import {
   cityToSlug,
   displayCity,
 } from '@/lib/states';
-import { generateStateMetadata, breadcrumbJsonLd, collectionPageJsonLd } from '@/lib/seo';
+import { generateStateMetadata, breadcrumbJsonLd, collectionPageJsonLd, faqPageJsonLd } from '@/lib/seo';
 import { toTitleCase } from '@/lib/utils';
+import { STATE_AGENCY } from '@/lib/states';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
@@ -54,6 +55,9 @@ export default async function StatePage({ params }: Props) {
   const total = facilities.length;
   const hasInspectionData = facilities.some(f => f.total_violations !== null);
   const totalCitations = facilities.reduce((sum, f) => sum + (f.total_violations ?? 0), 0);
+  const violationCount = facilities.filter(f => f.total_violations !== null && f.total_violations > 0).length;
+  const cleanCount = facilities.filter(f => f.total_violations === 0).length;
+  const agencyName = STATE_AGENCY[stateCode] ?? `${stateName} Department of Health`;
 
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
@@ -80,6 +84,19 @@ export default async function StatePage({ params }: Props) {
             description: `Inspection reports and violation data for ${total} assisted living facilities in ${stateName}.`,
             url: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com'}/${stateSlug}`,
             count: total,
+          })),
+        }}
+      />
+      {/* Schema.org FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqPageJsonLd({
+            stateName,
+            totalCount: total,
+            violationCount,
+            cleanCount,
+            agencyName,
           })),
         }}
       />
@@ -211,6 +228,58 @@ export default async function StatePage({ params }: Props) {
               </Link>
             ))}
           </div>
+        </div>
+        {/* FAQ Section */}
+        <div className="mt-12 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Frequently Asked Questions About Assisted Living in {stateName}
+          </h2>
+          <dl className="mt-6 divide-y divide-warm-100">
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                How many assisted living facilities are in {stateName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {stateName} has {total.toLocaleString()} licensed assisted living facilities.
+                {hasInspectionData && (
+                  <> Of these, {violationCount.toLocaleString()} have documented violations on file, and {cleanCount.toLocaleString()} have clean inspection records.</>
+                )}{' '}
+                Data is sourced from {agencyName} inspection records.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                How often are assisted living facilities inspected in {stateName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {stateName} inspections are conducted by {agencyName}. Most assisted living facilities are subject to annual unannounced surveys, plus complaint-driven investigations. All reports reviewed by The Care Audit become part of each facility&apos;s public record.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                What should I look for in an inspection report?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                Look for the number of citations, their severity level, whether financial penalties were imposed, and whether deficiencies were corrected on follow-up. Repeat violations across multiple surveys are a significant red flag. Facilities with zero citations have passed all inspections in the reviewed period.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                What are the most common violations at assisted living facilities in {stateName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                Common violations include medication management errors, inadequate staffing ratios, failure to maintain individualized care plans, and physical plant or fire safety deficiencies. The Care Audit shows the full citation history for each facility.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                Is The Care Audit affiliated with {stateName} government?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                No. The Care Audit is an independent public resource. All data is sourced directly from official state health department inspection records and made available as a free public service.
+              </dd>
+            </div>
+          </dl>
         </div>
       </main>
 

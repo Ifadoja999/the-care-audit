@@ -4,7 +4,7 @@ import { STATE_INFO, cityToSlug } from '@/lib/states';
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com').trim();
 const PAGE_SIZE = 1000;
-const FACILITIES_PER_SITEMAP = 40000;
+const FACILITIES_PER_SITEMAP = 5000;
 
 /**
  * Generates sitemap index entries. Next.js creates /sitemap.xml as an index
@@ -135,8 +135,8 @@ async function buildFacilitySitemap(supabase: ReturnType<typeof createServerClie
       entries.push({
         url: `${SITE_URL}/${f.slug}`,
         lastModified: f.last_updated ? new Date(f.last_updated) : new Date(),
-        changeFrequency: hasData ? 'monthly' : 'yearly',
-        priority: isClosed ? 0.3 : hasData ? 0.7 : 0.4,
+        changeFrequency: isClosed ? 'yearly' : hasData ? 'weekly' : 'monthly',
+        priority: isClosed ? 0.3 : hasData ? 0.8 : 0.6,
       });
     }
     if (data.length < batchSize) break;

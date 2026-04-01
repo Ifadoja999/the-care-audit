@@ -172,6 +172,63 @@ export function localBusinessJsonLd(facility: Facility): object {
   return schema;
 }
 
+export function faqPageJsonLd(opts: {
+  stateName: string;
+  totalCount: number;
+  violationCount: number;
+  cleanCount: number;
+  agencyName: string;
+}): object {
+  const { stateName, totalCount, violationCount, cleanCount, agencyName } = opts;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How many assisted living facilities are in ${stateName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${stateName} has ${totalCount.toLocaleString()} licensed assisted living facilities. Of these, ${violationCount.toLocaleString()} have documented violations on file, and ${cleanCount.toLocaleString()} have clean inspection records. Data is sourced from ${agencyName} inspection records.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `How often are assisted living facilities inspected in ${stateName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${stateName} inspections are conducted by ${agencyName}. Most assisted living facilities are subject to annual unannounced surveys, plus complaint-driven investigations. All reports reviewed by The Care Audit become part of each facility's public record.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What should I look for in an inspection report?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Look for the number of citations, their severity level, whether financial penalties were imposed, and whether deficiencies were corrected on follow-up. Repeat violations across multiple surveys are a significant red flag. Facilities with zero citations have passed all inspections in the reviewed period.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `What are the most common violations at assisted living facilities in ${stateName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Common violations include medication management errors, inadequate staffing ratios, failure to maintain individualized care plans, and physical plant or fire safety deficiencies. The Care Audit shows the full citation history for each facility.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Is The Care Audit affiliated with ${stateName} government?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `No. The Care Audit is an independent public resource. All data is sourced directly from official state health department inspection records and made available as a free public service.`,
+        },
+      },
+    ],
+  };
+}
+
 export function collectionPageJsonLd(opts: {
   name: string;
   description: string;

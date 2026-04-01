@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import { AlertTriangle, CheckCircle2, Globe, Info, Mail, Phone, MapPin, Calendar, ExternalLink, HelpCircle } from 'lucide-react';
-import { getFacilityBySlug } from '@/lib/queries';
+import { getFacilityBySlug, getRelatedFacilities } from '@/lib/queries';
 import { createServerClient } from '@/lib/supabase';
 import {
   slugToStateCode,
@@ -99,6 +99,10 @@ export default async function FacilityPage({ params }: Props) {
 
   // Get photos for Tier 1 only
   const photos = isTier1 ? await getFacilityPhotos(slug) : [];
+
+  const relatedFacilities = stateCode
+    ? await getRelatedFacilities(stateCode, facility.city, slug)
+    : [];
 
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
@@ -399,6 +403,38 @@ export default async function FacilityPage({ params }: Props) {
                 </>
               );
             })()}
+          </div>
+        )}
+
+        {/* Related Facilities */}
+        {relatedFacilities.length > 0 && (
+          <div className="mt-10">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+              Other Assisted Living Facilities in {cityName}, {stateName}
+            </h2>
+            <ul className="divide-y divide-warm-100 rounded-2xl border border-warm-200 bg-white shadow-sm">
+              {relatedFacilities.map((f) => (
+                <li key={f.slug}>
+                  <a
+                    href={`/${f.slug}`}
+                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-warm-50"
+                  >
+                    <span className="font-medium text-gray-800">
+                      {toTitleCase(f.facility_name)}
+                    </span>
+                    {f.total_violations === null ? null : f.total_violations === 0 ? (
+                      <span className="ml-4 shrink-0 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                        Clean record
+                      </span>
+                    ) : (
+                      <span className="ml-4 shrink-0 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                        {f.total_violations} violation{f.total_violations === 1 ? '' : 's'}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

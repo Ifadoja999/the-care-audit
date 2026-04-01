@@ -265,3 +265,34 @@ export async function getAllCitiesByState(stateCode: string): Promise<CityStats[
     .map(([city, facility_count]) => ({ city, facility_count }))
     .sort((a, b) => a.city.localeCompare(b.city));
 }
+
+export interface RelatedFacility {
+  facility_name: string;
+  slug: string;
+  total_violations: number | null;
+}
+
+export async function getRelatedFacilities(
+  stateCode: string,
+  city: string,
+  currentSlug: string
+): Promise<RelatedFacility[]> {
+  const supabase = createServerClient();
+
+  const { data, error } = await supabase
+    .from('facilities')
+    .select('facility_name, slug, total_violations')
+    .eq('state', stateCode.toUpperCase())
+    .ilike('city', city.replace(/\s/g, '_'))
+    .eq('facility_status', 'active')
+    .neq('slug', currentSlug)
+    .order('total_violations', { ascending: false, nullsFirst: false })
+    .limit(5);
+
+  if (error) {
+    console.error('getRelatedFacilities error:', error.message);
+    return [];
+  }
+
+  return (data as RelatedFacility[]) ?? [];
+}
