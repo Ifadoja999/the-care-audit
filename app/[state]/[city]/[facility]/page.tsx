@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AlertTriangle, CheckCircle2, Globe, Info, Mail, Phone, MapPin, Calendar, ExternalLink, HelpCircle } from 'lucide-react';
 import { getFacilityBySlug, getRelatedFacilities } from '@/lib/queries';
@@ -18,6 +19,7 @@ import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
+import ContactFacilityForm from '@/components/ContactFacilityForm';
 
 // ISR: pages generate on first visit, then revalidate every 7 days
 // Data only changes monthly (pipeline runs), so 7-day interval reduces ISR writes ~7x
@@ -283,6 +285,22 @@ export default async function FacilityPage({ params }: Props) {
           </div>
         )}
 
+        {/* 5b. Contact This Facility — Tier 1 and Tier 2 with contact_email */}
+        {(isTier1 || isTier2) && facility.contact_email && (
+          <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
+              Contact This Facility
+            </h2>
+            <p className="mt-0.5 text-sm text-gray-500">Send an inquiry directly to the facility.</p>
+            <div className="mt-4">
+              <ContactFacilityForm
+                facilityId={facility.id}
+                facilityName={facility.facility_name}
+              />
+            </div>
+          </div>
+        )}
+
         {/* 6. Violation Summary Card */}
         <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col items-center text-center">
@@ -437,6 +455,22 @@ export default async function FacilityPage({ params }: Props) {
             </ul>
           </div>
         )}
+
+        {/* Internal linking: city and state navigation */}
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href={`/${stateSlug}/${citySlug}`}
+            className="flex-1 rounded-xl border border-warm-200 bg-white px-5 py-4 text-center text-sm font-medium text-navy shadow-sm transition-all hover:border-navy hover:shadow-md"
+          >
+            View all assisted living facilities in {cityName}, {stateName}
+          </Link>
+          <Link
+            href={`/${stateSlug}`}
+            className="flex-1 rounded-xl border border-warm-200 bg-white px-5 py-4 text-center text-sm font-medium text-navy shadow-sm transition-all hover:border-navy hover:shadow-md"
+          >
+            Browse all {stateName} assisted living facilities
+          </Link>
+        </div>
 
       </main>
 

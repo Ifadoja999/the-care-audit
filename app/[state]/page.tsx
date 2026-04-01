@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getAllStates, getAllCitiesByState, getFacilitiesByState, getFeaturedFacilities } from '@/lib/queries';
+import { getAllStates, getAllCitiesByState, getFacilitiesByState, getFeaturedFacilities, getTopFacilitiesByState } from '@/lib/queries';
 import {
   slugToStateCode,
   stateCodeToName,
@@ -44,10 +44,11 @@ export default async function StatePage({ params }: Props) {
 
   const stateName = stateCodeToName(stateCode);
 
-  const [facilities, cities, featured] = await Promise.all([
+  const [facilities, cities, featured, topFacilities] = await Promise.all([
     getFacilitiesByState(stateCode),
     getAllCitiesByState(stateCode),
     getFeaturedFacilities(stateCode),
+    getTopFacilitiesByState(stateCode, 5),
   ]);
 
   if (facilities.length === 0) notFound();
@@ -229,6 +230,37 @@ export default async function StatePage({ params }: Props) {
             ))}
           </div>
         </div>
+        {/* Top Facilities by Violations */}
+        {topFacilities.length > 0 && (
+          <div className="mt-10">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+              Most-Reviewed Facilities in {stateName}
+            </h2>
+            <ul className="divide-y divide-warm-100 rounded-2xl border border-warm-200 bg-white shadow-sm">
+              {topFacilities.map((f) => (
+                <li key={f.slug}>
+                  <Link
+                    href={`/${f.slug}`}
+                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-warm-50"
+                  >
+                    <div className="min-w-0">
+                      <span className="block font-medium text-gray-800">
+                        {toTitleCase(f.facility_name)}
+                      </span>
+                      <span className="text-sm text-gray-500">{displayCity(f.city)}</span>
+                    </div>
+                    {f.total_violations !== null && f.total_violations > 0 && (
+                      <span className="ml-4 shrink-0 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                        {f.total_violations} violation{f.total_violations === 1 ? '' : 's'}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* FAQ Section */}
         <div className="mt-12 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900">

@@ -266,6 +266,36 @@ export async function getAllCitiesByState(stateCode: string): Promise<CityStats[
     .sort((a, b) => a.city.localeCompare(b.city));
 }
 
+export interface TopFacility {
+  facility_name: string;
+  slug: string;
+  city: string;
+  total_violations: number | null;
+}
+
+export async function getTopFacilitiesByState(
+  stateCode: string,
+  limit = 5
+): Promise<TopFacility[]> {
+  const supabase = createServerClient();
+
+  const { data, error } = await supabase
+    .from('facilities')
+    .select('facility_name, slug, city, total_violations')
+    .eq('state', stateCode.toUpperCase())
+    .eq('facility_status', 'active')
+    .not('total_violations', 'is', null)
+    .order('total_violations', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('getTopFacilitiesByState error:', error.message);
+    return [];
+  }
+
+  return (data as TopFacility[]) ?? [];
+}
+
 export interface RelatedFacility {
   facility_name: string;
   slug: string;
