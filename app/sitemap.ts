@@ -122,13 +122,15 @@ async function buildFacilitySitemap(supabase: ReturnType<typeof createServerClie
     const batchSize = Math.min(PAGE_SIZE, FACILITIES_PER_SITEMAP - from);
     const { data, error } = await supabase
       .from('facilities')
-      .select('slug, last_updated, facility_status, total_violations')
+      .select('slug, last_updated, facility_status, total_violations, ai_summary')
       .order('id')
       .range(offset + from, offset + from + batchSize - 1);
     if (error || !data || data.length === 0) break;
     for (const f of data) {
       // Skip facilities with bad slug patterns (HTML entity artifacts)
       if (/39/.test(f.slug) || /-amp-/.test(f.slug)) continue;
+      // Skip thin pages (no violation data and no AI summary) — matches noindex condition in seo.ts
+      if (f.total_violations === null && !f.ai_summary) continue;
 
       const isClosed = f.facility_status === 'closed';
       const hasData = f.total_violations !== null;

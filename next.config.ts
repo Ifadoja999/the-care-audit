@@ -96,6 +96,12 @@ const nextConfig: NextConfig = {
         destination: 'https://www.thecareaudit.com/:path*',
         permanent: true,
       },
+      // Sitemap XML → sitemap index (fixes GSC 404 on /sitemap.xml)
+      {
+        source: '/sitemap.xml',
+        destination: '/sitemap-index.xml',
+        permanent: true,
+      },
       // Specific facility redirects FIRST (before city wildcards catch them)
       ...cityRedirects
         .filter(([oldPath]) => oldPath.split('/').length === 3)

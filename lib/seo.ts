@@ -48,34 +48,47 @@ export function generateFacilityMetadata(facility: Facility): Metadata {
   const name = toTitleCase(facility.facility_name);
   const violations = facility.total_violations;
   const hasViolationData = violations !== null;
-  const violationText = !hasViolationData
-    ? `Licensed Assisted Living in ${city}, ${stateName}`
-    : `${violations} Violation${violations === 1 ? '' : 's'}`;
-  const title = `${name} — ${violationText}`;
-  const description = facility.ai_summary
-    ? facility.ai_summary.slice(0, 155)
-    : !hasViolationData
-      ? `${name} is a state-licensed assisted living facility in ${city}, ${stateName}. View facility details, licensing information, address, and contact information.`
-      : `See the inspection report and violation history for ${name} in ${city}, ${stateName}. ${violations} violation${violations === 1 ? '' : 's'} found.`;
+
+  // Title: "[Facility Name] - Assisted Living in [City], [State]"
+  // Layout template appends " | The Care Audit"
+  const title = `${name} - Assisted Living in ${city}, ${stateName}`;
+
+  // Description: 140-160 chars, include violation data if available, end with CTA
+  let description: string;
+  if (facility.ai_summary && facility.ai_summary.length >= 80) {
+    // Trim AI summary to ~140 chars and append CTA
+    const trimmed = facility.ai_summary.slice(0, 120).replace(/\s+\S*$/, '');
+    description = `${trimmed}. View the full inspection report.`;
+  } else if (!hasViolationData) {
+    description = `${name} is a licensed assisted living facility in ${city}, ${stateName}. View licensing details, address, and contact information — always free.`;
+  } else if (violations === 0) {
+    description = `${name} in ${city}, ${stateName} has a clean inspection record with zero violations. View the full inspection history and facility details on The Care Audit.`;
+  } else {
+    description = `${name} in ${city}, ${stateName} has ${violations} violation${violations === 1 ? '' : 's'} on record. View the full inspection report and violation history — always free.`;
+  }
+
   const url = `${SITE_URL}/${facility.slug}`;
-  const ogTitle = `${name} — ${violationText} | ${SITE_NAME}`;
+
+  // Thin pages (no enrichment data at all) should not be indexed
+  const isThinPage = facility.total_violations === null && !facility.ai_summary;
 
   return {
     title,
     description,
     alternates: { canonical: url },
+    ...(isThinPage ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
-      title: ogTitle,
-      description: facility.ai_summary ?? description,
+      title,
+      description,
       url,
       siteName: SITE_NAME,
       type: 'website',
-      images: ogImages(ogTitle),
+      images: ogImages(title),
     },
     twitter: {
       card: 'summary_large_image',
-      title: ogTitle,
-      description: facility.ai_summary ?? description,
+      title,
+      description,
       images: [OG_IMAGE],
     },
   };
@@ -84,26 +97,31 @@ export function generateFacilityMetadata(facility: Facility): Metadata {
 export function generateStateMetadata(stateCode: string, facilityCount: number): Metadata {
   const stateName = getStateName(stateCode);
   const slug = stateName.toLowerCase().replace(/\s+/g, '-');
-  const title = `Assisted Living Facility Inspection Reports in ${stateName}`;
-  const description = `View inspection reports and violation data for ${facilityCount.toLocaleString()} assisted living facilities in ${stateName}.`;
+
+  // Title: "Assisted Living in [State] - [N] Facilities"
+  // Layout template appends " | The Care Audit"
+  const title = `Assisted Living in ${stateName} — ${facilityCount.toLocaleString()} Facilities`;
+
+  // Description: 140-160 chars with CTA
+  const description = `Browse inspection reports and violation histories for all ${facilityCount.toLocaleString()} licensed assisted living facilities in ${stateName}. Free, plain-English summaries powered by AI.`;
+
   const url = `${SITE_URL}/${slug}`;
-  const ogTitle = `Assisted Living Facility Inspection Reports in ${stateName} | ${SITE_NAME}`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: ogTitle,
+      title,
       description,
       url,
       siteName: SITE_NAME,
       type: 'website',
-      images: ogImages(ogTitle),
+      images: ogImages(title),
     },
     twitter: {
       card: 'summary_large_image',
-      title: ogTitle,
+      title,
       description,
       images: [OG_IMAGE],
     },
@@ -119,26 +137,31 @@ export function generateCityMetadata(
   const stateSlug = stateName.toLowerCase().replace(/\s+/g, '-');
   const citySlug = city.toLowerCase().replace(/\s+/g, '-');
   const cityTitle = toTitleCase(city);
-  const title = `Assisted Living Facilities in ${cityTitle}, ${stateCode}`;
-  const description = `Inspection reports and violation data for ${facilityCount} assisted living facilities in ${cityTitle}, ${stateName}.`;
+
+  // Title: "Assisted Living in [City], [State] - [N] Facilities"
+  // Layout template appends " | The Care Audit"
+  const title = `Assisted Living in ${cityTitle}, ${stateName} — ${facilityCount} ${facilityCount === 1 ? 'Facility' : 'Facilities'}`;
+
+  // Description: 140-160 chars with CTA
+  const description = `View inspection reports and violation histories for all ${facilityCount} licensed assisted living ${facilityCount === 1 ? 'facility' : 'facilities'} in ${cityTitle}, ${stateName}. Free, AI-powered summaries.`;
+
   const url = `${SITE_URL}/${stateSlug}/${citySlug}`;
-  const ogTitle = `Assisted Living Facilities in ${cityTitle}, ${stateName} | ${SITE_NAME}`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: ogTitle,
+      title,
       description,
       url,
       siteName: SITE_NAME,
       type: 'website',
-      images: ogImages(ogTitle),
+      images: ogImages(title),
     },
     twitter: {
       card: 'summary_large_image',
-      title: ogTitle,
+      title,
       description,
       images: [OG_IMAGE],
     },
@@ -161,12 +184,20 @@ export function localBusinessJsonLd(facility: Facility): object {
       streetAddress: facility.address ?? undefined,
       addressLocality: toTitleCase(facility.city),
       addressRegion: facility.state,
-      addressCountry: 'US',
+      postalAddressCountry: 'US',
     },
   };
 
   if (facility.phone) {
     schema.telephone = facility.phone;
+  }
+
+  if (facility.website_url) {
+    schema.sameAs = facility.website_url;
+  }
+
+  if (facility.licensed_capacity != null && facility.licensed_capacity > 0) {
+    schema.numberOfRooms = facility.licensed_capacity;
   }
 
   return schema;
@@ -223,6 +254,125 @@ export function faqPageJsonLd(opts: {
         acceptedAnswer: {
           '@type': 'Answer',
           text: `No. The Care Audit is an independent public resource. All data is sourced directly from official state health department inspection records and made available as a free public service.`,
+        },
+      },
+    ],
+  };
+}
+
+export function cityFaqPageJsonLd(opts: {
+  cityName: string;
+  stateName: string;
+  facilityCount: number;
+  violationCount: number;
+  cleanCount: number;
+  hasInspectionData: boolean;
+}): object {
+  const { cityName, stateName, facilityCount, violationCount, cleanCount, hasInspectionData } = opts;
+
+  const countAnswer = hasInspectionData
+    ? `${cityName}, ${stateName} has ${facilityCount.toLocaleString()} licensed assisted living facilities. Of these, ${violationCount.toLocaleString()} have documented violations on file, and ${cleanCount.toLocaleString()} have clean inspection records.`
+    : `${cityName}, ${stateName} has ${facilityCount.toLocaleString()} licensed assisted living facilities listed in The Care Audit directory.`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How many assisted living facilities are in ${cityName}, ${stateName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: countAnswer,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `How do I find inspection reports for assisted living facilities in ${cityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `The Care Audit lists all licensed assisted living facilities in ${cityName}, ${stateName}. Click any facility to view its full inspection history, violation records, and AI-generated summary sourced directly from official state health department records.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Are assisted living facilities in ${cityName} state-regulated?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes. All assisted living facilities in ${cityName}, ${stateName} are licensed and inspected by the ${stateName} state health authority. Inspections are typically conducted on an annual unannounced basis, with additional inspections triggered by complaints or incidents.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `What information does The Care Audit provide for ${cityName} facilities?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `For each facility in ${cityName}, The Care Audit provides the full inspection citation history, violation counts, facility address and contact information, license status, and — where available — an AI-generated plain-English summary of the inspection findings.`,
+        },
+      },
+    ],
+  };
+}
+
+export function facilityFaqPageJsonLd(opts: {
+  facilityName: string;
+  cityName: string;
+  stateName: string;
+  totalViolations: number | null;
+  lastInspectionDate: string | null;
+  hasReportUrl: boolean;
+}): object {
+  const { facilityName, cityName, stateName, totalViolations, lastInspectionDate, hasReportUrl } = opts;
+
+  const violationAnswer =
+    totalViolations === null
+      ? `Inspection data for ${facilityName} has not yet been processed in our system. Check back soon, or view the official state health department website for the most current records.`
+      : totalViolations === 0
+        ? `${facilityName} has a clean inspection record with zero violations documented in The Care Audit database.`
+        : `${facilityName} has ${totalViolations.toLocaleString()} violation${totalViolations === 1 ? '' : 's'} documented in The Care Audit database. Review the full citation details on this page.`;
+
+  const inspDateAnswer = lastInspectionDate
+    ? `The most recent inspection date on file for ${facilityName} is ${new Date(lastInspectionDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Facilities are typically re-inspected annually.`
+    : `The last inspection date for ${facilityName} is not currently on file. Facilities in ${stateName} are typically inspected annually by the state health authority.`;
+
+  const reportAnswer = hasReportUrl
+    ? `Yes. A link to the official state inspection report for ${facilityName} is available on this page. The report is hosted on the ${stateName} government website.`
+    : `The official state inspection report for ${facilityName} may be available through the ${stateName} state health department. The Care Audit summarizes publicly available inspection data for this facility.`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How many violations does ${facilityName} have?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: violationAnswer,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `When was ${facilityName} last inspected?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: inspDateAnswer,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Is there an official inspection report for ${facilityName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: reportAnswer,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Is ${facilityName} a licensed facility in ${stateName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${facilityName} is listed in The Care Audit as a state-licensed assisted living facility in ${cityName}, ${stateName}. Licensing status is sourced from official ${stateName} health department records and is updated periodically.`,
         },
       },
     ],
