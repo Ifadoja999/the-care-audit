@@ -47,6 +47,9 @@ export default function Footer() {
               <li>
                 <Link href="/for-facilities" className="text-blue-100 transition-colors duration-200 hover:text-white">For Facilities</Link>
               </li>
+              <li>
+                <Link href="/resources" className="text-blue-100 transition-colors duration-200 hover:text-white">Resources</Link>
+              </li>
             </ul>
           </div>
 
