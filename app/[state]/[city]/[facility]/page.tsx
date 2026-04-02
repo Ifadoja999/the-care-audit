@@ -14,12 +14,13 @@ import {
   generateFacilityMetadata,
   localBusinessJsonLd,
   breadcrumbJsonLd,
+  facilityFaqPageJsonLd,
 } from '@/lib/seo';
 import { toTitleCase } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
-import ContactFacilityForm from '@/components/ContactFacilityForm';
+
 
 // ISR: pages generate on first visit, then revalidate every 7 days
 // Data only changes monthly (pipeline runs), so 7-day interval reduces ISR writes ~7x
@@ -128,6 +129,20 @@ export default async function FacilityPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(localBusinessJsonLd(facility)),
+        }}
+      />
+      {/* Schema.org FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(facilityFaqPageJsonLd({
+            facilityName: toTitleCase(facility.facility_name),
+            cityName,
+            stateName,
+            totalViolations: facility.total_violations,
+            lastInspectionDate: facility.last_inspection_date ?? null,
+            hasReportUrl: !!facility.report_url,
+          })),
         }}
       />
 
@@ -253,6 +268,7 @@ export default async function FacilityPage({ params }: Props) {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 400px"
+                  priority={i === 0}
                 />
               </div>
             ))}
@@ -286,20 +302,7 @@ export default async function FacilityPage({ params }: Props) {
         )}
 
         {/* 5b. Contact This Facility — Tier 1 and Tier 2 with contact_email */}
-        {(isTier1 || isTier2) && facility.contact_email && (
-          <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
-              Contact This Facility
-            </h2>
-            <p className="mt-0.5 text-sm text-gray-500">Send an inquiry directly to the facility.</p>
-            <div className="mt-4">
-              <ContactFacilityForm
-                facilityId={facility.id}
-                facilityName={facility.facility_name}
-              />
-            </div>
-          </div>
-        )}
+        {/* ContactFacilityForm - removed pending completion, will be re-added */}
 
         {/* 6. Violation Summary Card */}
         <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
@@ -455,6 +458,58 @@ export default async function FacilityPage({ params }: Props) {
             </ul>
           </div>
         )}
+
+        {/* FAQ Section */}
+        <div className="mt-12 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Frequently Asked Questions About {toTitleCase(facility.facility_name)}
+          </h2>
+          <dl className="mt-6 divide-y divide-warm-100">
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                How many violations does {toTitleCase(facility.facility_name)} have?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {facility.total_violations === null
+                  ? `Inspection data for ${toTitleCase(facility.facility_name)} has not yet been processed. Check back soon, or view the official state health department website for current records.`
+                  : facility.total_violations === 0
+                    ? `${toTitleCase(facility.facility_name)} has a clean inspection record with zero violations documented in The Care Audit database.`
+                    : `${toTitleCase(facility.facility_name)} has ${facility.total_violations.toLocaleString()} violation${facility.total_violations === 1 ? '' : 's'} documented in The Care Audit database. Review the full citation details above.`
+                }
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                When was {toTitleCase(facility.facility_name)} last inspected?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {inspDate
+                  ? `The most recent inspection date on file is ${inspDate}. Facilities in ${stateName} are typically re-inspected annually.`
+                  : `The last inspection date for this facility is not currently on file. Facilities in ${stateName} are typically inspected annually by the state health authority.`
+                }
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                Is there an official inspection report for {toTitleCase(facility.facility_name)}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {facility.report_url
+                  ? `Yes. A link to the official state inspection report is available on this page. The report is hosted on the ${stateName} government website.`
+                  : `The official state inspection report may be available through the ${stateName} state health department. The Care Audit summarizes publicly available inspection data for this facility.`
+                }
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                Is {toTitleCase(facility.facility_name)} a licensed facility in {stateName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {toTitleCase(facility.facility_name)} is listed in The Care Audit as a state-licensed assisted living facility in {cityName}, {stateName}. Licensing status is sourced from official {stateName} health department records and is updated periodically.
+              </dd>
+            </div>
+          </dl>
+        </div>
 
         {/* Internal linking: city and state navigation */}
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
