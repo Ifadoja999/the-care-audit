@@ -146,7 +146,7 @@ function buildOutreachEmail(facility: any): string {
       using state inspection data. Your facility's profile is live and publicly accessible.</p>
       <p>You can enhance your listing with verified badges, updated contact info, photos, and more.</p>
       <div style="text-align: center; margin: 32px 0;">
-        <a href="https://www.thecareaudit.com/for-facilities"
+        <a href="https://www.thecareaudit.com/for-facilities?facility_id=${facility.id}"
            style="background: #2563EB; color: white; padding: 14px 32px; border-radius: 8px;
                   text-decoration: none; font-weight: bold; display: inline-block;">
           View Your Options

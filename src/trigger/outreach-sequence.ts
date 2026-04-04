@@ -440,7 +440,7 @@ function buildTemplateVars(facility: FacilityData): TemplateVars {
     stateName,
     totalViolations: facility.total_violations,
     facilityUrl: `${base}/${slug}`,
-    forFacilitiesUrl: `${base}/for-facilities`,
+    forFacilitiesUrl: `${base}/for-facilities?facility_id=${facility.id}`,
     optOutUrl: `${base}/api/outreach/opt-out?facility_id=${facility.id}`,
     violationText: getViolationText(facility.total_violations),
     isClean: facility.total_violations === null || facility.total_violations <= 3,
