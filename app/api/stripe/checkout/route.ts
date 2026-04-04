@@ -64,6 +64,12 @@ export async function POST(req: NextRequest) {
         tier,
         facility_name: facility.facility_name,
       },
+      subscription_data: {
+        metadata: {
+          facility_id: facility.id,
+          tier,
+        },
+      },
       success_url: `${siteUrl}/for-facilities?success=true`,
       cancel_url: `${siteUrl}/for-facilities?canceled=true`,
       allow_promotion_codes: true,
