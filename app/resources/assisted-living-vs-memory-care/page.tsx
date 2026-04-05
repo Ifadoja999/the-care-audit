@@ -184,9 +184,9 @@ export default function AssistedLivingVsMemoryCarePage() {
               Assisted living facilities are regulated and inspected by state health departments.
               Inspection records — including any violations and deficiencies — are public and available
               through The Care Audit for facilities in{' '}
-              <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-              <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-              <Link href="/ca" className="text-accent hover:underline">California</Link>,{' '}
+              <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+              <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+              <Link href="/california" className="text-accent hover:underline">California</Link>,{' '}
               and all 50 states.
             </p>
           </section>
@@ -269,9 +269,9 @@ export default function AssistedLivingVsMemoryCarePage() {
               transition process looks like. Also ask about the facility&apos;s inspection record —
               including any violations related to resident safety, elopement, or staffing levels.
               The Care Audit has those records for{' '}
-              <Link href="/az" className="text-accent hover:underline">Arizona</Link>,{' '}
-              <Link href="/nc" className="text-accent hover:underline">North Carolina</Link>,{' '}
-              <Link href="/pa" className="text-accent hover:underline">Pennsylvania</Link>,{' '}
+              <Link href="/arizona" className="text-accent hover:underline">Arizona</Link>,{' '}
+              <Link href="/north-carolina" className="text-accent hover:underline">North Carolina</Link>,{' '}
+              <Link href="/pennsylvania" className="text-accent hover:underline">Pennsylvania</Link>,{' '}
               and every other state.
             </p>
           </section>

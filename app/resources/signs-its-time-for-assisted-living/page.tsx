@@ -299,10 +299,10 @@ export default function SignsItsTimePage() {
               Every state inspects assisted living facilities on a regular basis. Inspection reports
               document violations, deficiencies, and complaints — and they are public record. The
               Care Audit aggregates and presents those records in plain English for{' '}
-              <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-              <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-              <Link href="/ca" className="text-accent hover:underline">California</Link>,{' '}
-              <Link href="/ny" className="text-accent hover:underline">New York</Link>,{' '}
+              <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+              <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+              <Link href="/california" className="text-accent hover:underline">California</Link>,{' '}
+              <Link href="/new-york" className="text-accent hover:underline">New York</Link>,{' '}
               and every other state in the country.
             </p>
             <p className="mt-4">

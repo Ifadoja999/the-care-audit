@@ -285,10 +285,10 @@ export default function MedicarePage() {
               Every state inspects assisted living facilities and publishes those results publicly.
               The Care Audit aggregates those inspection records — violations, deficiencies, and
               survey outcomes — for facilities in{' '}
-              <Link href="/al" className="text-accent hover:underline">Alabama</Link>,{' '}
-              <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-              <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-              <Link href="/ca" className="text-accent hover:underline">California</Link>, and{' '}
+              <Link href="/alabama" className="text-accent hover:underline">Alabama</Link>,{' '}
+              <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+              <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+              <Link href="/california" className="text-accent hover:underline">California</Link>, and{' '}
               <Link href="/" className="text-accent hover:underline">all 50 states</Link>.
             </p>
             <p className="mt-4">

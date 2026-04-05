@@ -161,45 +161,45 @@ export default function AssistedLivingCostPage() {
                     <td className="border border-gray-200 px-4 py-2 font-medium">Northeast</td>
                     <td className="border border-gray-200 px-4 py-2">$5,500 – $7,500+</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      <Link href="/ma" className="text-accent hover:underline">Massachusetts</Link>,{' '}
-                      <Link href="/ny" className="text-accent hover:underline">New York</Link>,{' '}
-                      <Link href="/ct" className="text-accent hover:underline">Connecticut</Link>
+                      <Link href="/massachusetts" className="text-accent hover:underline">Massachusetts</Link>,{' '}
+                      <Link href="/new-york" className="text-accent hover:underline">New York</Link>,{' '}
+                      <Link href="/connecticut" className="text-accent hover:underline">Connecticut</Link>
                     </td>
                   </tr>
                   <tr className="bg-warm-50">
                     <td className="border border-gray-200 px-4 py-2 font-medium">West Coast</td>
                     <td className="border border-gray-200 px-4 py-2">$5,000 – $7,000+</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      <Link href="/ca" className="text-accent hover:underline">California</Link>,{' '}
-                      <Link href="/wa" className="text-accent hover:underline">Washington</Link>,{' '}
-                      <Link href="/or" className="text-accent hover:underline">Oregon</Link>
+                      <Link href="/california" className="text-accent hover:underline">California</Link>,{' '}
+                      <Link href="/washington" className="text-accent hover:underline">Washington</Link>,{' '}
+                      <Link href="/oregon" className="text-accent hover:underline">Oregon</Link>
                     </td>
                   </tr>
                   <tr className="bg-white">
                     <td className="border border-gray-200 px-4 py-2 font-medium">Midwest</td>
                     <td className="border border-gray-200 px-4 py-2">$3,500 – $5,000</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      <Link href="/il" className="text-accent hover:underline">Illinois</Link>,{' '}
-                      <Link href="/oh" className="text-accent hover:underline">Ohio</Link>,{' '}
-                      <Link href="/mi" className="text-accent hover:underline">Michigan</Link>
+                      <Link href="/illinois" className="text-accent hover:underline">Illinois</Link>,{' '}
+                      <Link href="/ohio" className="text-accent hover:underline">Ohio</Link>,{' '}
+                      <Link href="/michigan" className="text-accent hover:underline">Michigan</Link>
                     </td>
                   </tr>
                   <tr className="bg-warm-50">
                     <td className="border border-gray-200 px-4 py-2 font-medium">South</td>
                     <td className="border border-gray-200 px-4 py-2">$3,000 – $4,500</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-                      <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-                      <Link href="/ga" className="text-accent hover:underline">Georgia</Link>
+                      <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+                      <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+                      <Link href="/georgia" className="text-accent hover:underline">Georgia</Link>
                     </td>
                   </tr>
                   <tr className="bg-white">
                     <td className="border border-gray-200 px-4 py-2 font-medium">Mountain/Great Plains</td>
                     <td className="border border-gray-200 px-4 py-2">$3,500 – $5,000</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      <Link href="/co" className="text-accent hover:underline">Colorado</Link>,{' '}
-                      <Link href="/az" className="text-accent hover:underline">Arizona</Link>,{' '}
-                      <Link href="/nm" className="text-accent hover:underline">New Mexico</Link>
+                      <Link href="/colorado" className="text-accent hover:underline">Colorado</Link>,{' '}
+                      <Link href="/arizona" className="text-accent hover:underline">Arizona</Link>,{' '}
+                      <Link href="/new-mexico" className="text-accent hover:underline">New Mexico</Link>
                     </td>
                   </tr>
                 </tbody>
@@ -287,9 +287,9 @@ export default function AssistedLivingCostPage() {
               Beyond pricing, review each facility&apos;s inspection history. State health departments
               conduct regular unannounced inspections of assisted living facilities. Those records
               are public, and The Care Audit has them in plain English for{' '}
-              <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-              <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-              <Link href="/ca" className="text-accent hover:underline">California</Link>,{' '}
+              <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+              <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+              <Link href="/california" className="text-accent hover:underline">California</Link>,{' '}
               and all 50 states.
             </p>
           </section>

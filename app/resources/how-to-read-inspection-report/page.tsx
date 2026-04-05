@@ -351,10 +351,10 @@ export default function HowToReadInspectionReportPage() {
                 <strong>The Care Audit:</strong> We aggregate inspection data from all 50 states
                 and present it in plain English — organized by facility, searchable by location,
                 and designed for families rather than regulators. Search facilities in{' '}
-                <Link href="/fl" className="text-accent hover:underline">Florida</Link>,{' '}
-                <Link href="/tx" className="text-accent hover:underline">Texas</Link>,{' '}
-                <Link href="/ca" className="text-accent hover:underline">California</Link>,{' '}
-                <Link href="/ny" className="text-accent hover:underline">New York</Link>,{' '}
+                <Link href="/florida" className="text-accent hover:underline">Florida</Link>,{' '}
+                <Link href="/texas" className="text-accent hover:underline">Texas</Link>,{' '}
+                <Link href="/california" className="text-accent hover:underline">California</Link>,{' '}
+                <Link href="/new-york" className="text-accent hover:underline">New York</Link>,{' '}
                 or{' '}
                 <Link href="/" className="text-accent hover:underline">any state</Link>.
               </li>
