@@ -75,9 +75,9 @@ export default async function HomePage() {
                 <Image
                   src="/images/logo-transparent.png"
                   alt="The Care Audit Logo"
-                  width={80}
-                  height={80}
-                  className="h-20 w-20"
+                  width={160}
+                  height={160}
+                  className="h-36 w-36"
                   priority
                 />
               </div>
