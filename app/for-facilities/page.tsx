@@ -17,6 +17,7 @@ interface FacilityResult {
   ai_summary?: string;
   address?: string;
   phone?: string;
+  report_url?: string;
 }
 
 function toTitleCase(str: string): string {
@@ -241,6 +242,21 @@ export default function ForFacilitiesPage() {
                         <p className="mt-2 text-sm leading-relaxed text-gray-600">{selected.ai_summary}</p>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Link to official report */}
+                {selected.report_url && (
+                  <div className="flex items-center gap-2 px-1">
+                    <FileText className="h-4 w-4 shrink-0 text-blue-500" />
+                    <a
+                      href={selected.report_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-blue-600 underline hover:text-blue-700"
+                    >
+                      View the official state inspection report
+                    </a>
                   </div>
                 )}
 
@@ -520,7 +536,15 @@ export default function ForFacilitiesPage() {
                 {results.map((f) => (
                   <button
                     key={f.id}
-                    onClick={() => { setSelected(f); setQuery(f.facility_name); setResults([]); }}
+                    onClick={() => {
+                      setQuery(f.facility_name);
+                      setResults([]);
+                      // Fetch full facility data (ai_summary, report_url, etc.)
+                      fetch(`/api/facility/lookup?id=${encodeURIComponent(f.id)}`)
+                        .then(r => r.ok ? r.json() : null)
+                        .then(data => { if (data && data.id) setSelected(data); else setSelected(f); })
+                        .catch(() => setSelected(f));
+                    }}
                     className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-xl last:rounded-b-xl"
                   >
                     <div>
