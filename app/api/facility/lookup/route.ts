@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   const base = supabase
     .from('facilities')
-    .select('id, facility_name, city, state, total_violations, slug');
+    .select('id, facility_name, city, state, total_violations, slug, last_inspection_date, licensed_capacity, ai_summary, address, phone');
 
   const { data, error } = await (id
     ? base.eq('id', id).single()
