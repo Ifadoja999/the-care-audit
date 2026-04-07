@@ -58,48 +58,80 @@ export default async function HomePage() {
       />
 
       {/* Hero */}
-      <section className="relative z-10 overflow-x-clip bg-gradient-to-br from-[#2563EB] to-[#3B82F6] px-4 py-16 lg:py-20">
-        {/* Radial glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15)_0%,_transparent_60%)]" />
-        {/* Decorative circles */}
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full bg-white/5" />
+      <section
+        className="relative z-10 overflow-hidden px-6 py-24 md:py-32"
+        style={{
+          backgroundColor: '#0b1326',
+          backgroundImage: 'radial-gradient(circle at 50% -20%, #131b2e 0%, #0b1326 70%)',
+        }}
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-12">
+            {/* Content Column (Left) */}
+            <div className="space-y-10 lg:col-span-6">
+              {/* Branding Anchor */}
+              <div className="relative inline-block">
+                <p className="mb-4 text-2xl font-bold tracking-tighter text-slate-50" style={{ fontFamily: 'var(--font-heading)' }}>The Care Audit</p>
+                <Image
+                  src="/images/logo-transparent.png"
+                  alt="The Care Audit Logo"
+                  width={80}
+                  height={80}
+                  className="h-20 w-20"
+                  priority
+                />
+              </div>
 
-        <div className="relative mx-auto max-w-6xl animate-fade-in">
-          <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
-            {/* Left: Text + Search */}
-            <div className="flex-1 text-center lg:text-left">
-              <Image
-                src="/images/logo.png"
-                alt="The Care Audit logo"
-                width={80}
-                height={80}
-                className="mx-auto mb-6 h-20 w-auto drop-shadow-[0_2px_10px_rgba(255,255,255,0.3)] lg:mx-0"
-                priority
-              />
-              <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.8rem]">
-                Assisted Living Inspection Reports
-                <br className="hidden sm:block" />
-                — In Plain English
-              </h1>
-              <p className="mt-4 text-base leading-relaxed text-blue-100 sm:text-lg">
-                Inspection data for all 50 states. Instantly searchable. Always free.
-              </p>
-              <div className="mt-8">
-                <SearchBar />
+              <div className="space-y-6">
+                <h1
+                  className="text-5xl font-bold leading-[1.1] tracking-tight md:text-6xl"
+                  style={{ fontFamily: 'var(--font-heading)', color: '#dae2fd' }}
+                >
+                  Assisted Living Inspection Reports
+                  <br />
+                  <span style={{ color: '#ffb95f' }}>In Plain English</span>
+                </h1>
+                <p className="max-w-xl text-xl leading-relaxed" style={{ color: '#c6c6cd' }}>
+                  Inspection data for all 50 states. Instantly searchable. Always free.
+                </p>
+              </div>
+
+              {/* Search Bar */}
+              <div className="max-w-2xl">
+                <SearchBar placeholder="Search by facility name or city..." />
+              </div>
+
+              {/* Trust Badge */}
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border-2" style={{ borderColor: '#0b1326', backgroundColor: '#222a3d' }}>
+                  <span className="text-[10px] font-bold uppercase tracking-tighter" style={{ color: '#ffb95f' }}>50</span>
+                </div>
+                <p className="text-xs font-medium uppercase tracking-[0.05em]" style={{ color: '#c6c6cd' }}>
+                  Comprehensive Data from All 50 U.S. States
+                </p>
               </div>
             </div>
 
-            {/* Right: Hero Image */}
-            <div className="flex-shrink-0 lg:w-[420px]">
-              <Image
-                src="/images/hero-seniors.jpg"
-                alt="Happy seniors enjoying a bright, modern assisted living community"
-                width={800}
-                height={600}
-                className="h-auto w-full rounded-2xl shadow-2xl object-cover ring-4 ring-white/20"
-                priority
-              />
+            {/* Imagery Column (Right) */}
+            <div className="relative lg:col-span-6">
+              <div
+                className="group relative z-10 overflow-hidden rounded-lg"
+                style={{ boxShadow: '0px 24px 48px rgba(0, 0, 0, 0.4)' }}
+              >
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b1326]/40 to-transparent opacity-60" />
+                <Image
+                  src="/images/hero-facility.png"
+                  alt="Modern assisted living facility at dusk with warm interior lights"
+                  width={1408}
+                  height={768}
+                  className="h-[600px] w-full rounded-lg object-cover transition-transform duration-700 group-hover:scale-105"
+                  style={{ border: '1px solid rgba(144, 144, 151, 0.15)' }}
+                  priority
+                />
+              </div>
+              {/* Background Accent (Asymmetry) */}
+              <div className="pointer-events-none absolute -right-12 -top-12 -z-10 h-64 w-64 rounded-full bg-[#adc6ff]/5 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-12 -left-12 -z-10 h-96 w-96 rounded-full bg-[#ffb95f]/5 blur-3xl" />
             </div>
           </div>
         </div>
