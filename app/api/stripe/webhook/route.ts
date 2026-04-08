@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       const customerEmail = session.customer_details?.email || session.customer_email;
 
       if (!facilityId || !tier) {
-        console.error('Missing metadata in checkout session');
+        console.error('Missing metadata in checkout session:', session.id);
         break;
       }
 
@@ -59,8 +59,9 @@ export async function POST(req: NextRequest) {
         .eq('id', facilityId);
 
       if (updateError) {
-        console.error('Failed to update facility:', updateError);
-        break;
+        console.error('Failed to update facility:', facilityId, updateError);
+        // Return 500 so Stripe retries the webhook
+        return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
       }
 
       // Get facility details for email and revalidation
@@ -107,8 +108,7 @@ export async function POST(req: NextRequest) {
       const facilityId = subscription.metadata?.facility_id;
 
       if (!facilityId) {
-        // Try to find facility by looking up the customer's active subscriptions
-        console.error('No facility_id in subscription metadata');
+        console.error('No facility_id in subscription metadata for sub:', subscription.id, '- cannot deactivate facility');
         break;
       }
 
