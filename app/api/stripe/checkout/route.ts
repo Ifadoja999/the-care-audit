@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
         facility_name: facility.facility_name,
       },
       subscription_data: {
+        trial_period_days: 7,
         metadata: {
           facility_id: facility.id,
           tier,

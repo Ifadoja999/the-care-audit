@@ -204,6 +204,35 @@ ${ctaButton('View Your Options', `${SITE_URL}/for-facilities`)}
   });
 }
 
+export async function sendTrialRecoveryEmail(params: {
+  email: string;
+  facilityName: string;
+  city: string;
+  state: string;
+  facilitySlug: string;
+}) {
+  const facilityUrl = `${SITE_URL}/for-facilities?facility_slug=${encodeURIComponent(params.facilitySlug)}`;
+  const content = `
+<h2 style="margin:0 0 16px;color:#111827;font-size:22px">You left before completing your listing</h2>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">We noticed you started setting up your listing for <strong>${params.facilityName}</strong> in ${params.city}, ${params.state} but didn&rsquo;t finish.</p>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">We&rsquo;ve made it easier to get started: <strong>all plans now include a free 7-day trial.</strong> No charge until after the trial ends.</p>
+<ul style="color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px">
+<li>Featured Verified &mdash; $149/month (priority placement, photos, Tour button)</li>
+<li>Verified Profile &mdash; $79/month (Claimed badge, updated contact info)</li>
+<li>Facility Response &mdash; $49/month (post your official response)</li>
+</ul>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">Try it free and see the value before you commit.</p>
+${ctaButton('Start Your Free 7-Day Trial', facilityUrl)}
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0;text-align:center">Questions? Reply to this email and we&rsquo;ll help.</p>`;
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: params.email,
+    subject: `Your free trial is ready — ${params.facilityName}`,
+    html: emailLayout(content),
+  });
+}
+
 export async function sendOutreachEmail(params: {
   email: string;
   facilityName: string;
@@ -218,8 +247,8 @@ export async function sendOutreachEmail(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px"><strong>${params.facilityName}</strong> in ${params.city}, ${params.state} is listed on The Care Audit, a public directory of assisted living facility inspection reports.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Thousands of families visit The Care Audit every month to research assisted living options. Your facility&rsquo;s profile currently shows <strong>${params.totalViolations} violation${params.totalViolations === 1 ? '' : 's'}</strong> from the most recent state inspection.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit organizes publicly available government inspection data into a searchable, readable format. All data comes directly from official state inspection reports.</p>
-<p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit offers facility owners the ability to enhance their listing, update their contact information, and stand out to families actively searching for care options.</p>
-${ctaButton('View Your Options', `${SITE_URL}/for-facilities`)}
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit offers facility owners the ability to enhance their listing, update their contact information, and stand out to families actively searching for care options. <strong>All plans include a free 7-day trial</strong> &mdash; no charge until after the trial ends.</p>
+${ctaButton('Start Your Free 7-Day Trial', `${SITE_URL}/for-facilities`)}
 <p style="color:#9ca3af;font-size:11px;line-height:1.5;margin:24px 0 0;text-align:center">
 <a href="${optOutUrl}" style="color:#9ca3af;text-decoration:underline">Unsubscribe from these emails</a>
 </p>`;
@@ -270,6 +299,33 @@ ${ctaButton('Manage Your Subscription', `${SITE_URL}/manage-subscription`)}`;
     from: FROM_EMAIL,
     to: params.email,
     subject: 'Your grandfathered rate expires next month',
+    html: emailLayout(content),
+  });
+}
+
+export async function sendLeadNotification(params: {
+  facilityEmail: string;
+  facilityName: string;
+  submitterName: string;
+  submitterEmail: string;
+  submitterPhone?: string;
+  message?: string;
+}) {
+  const content = `
+<h2 style="margin:0 0 16px;color:#111827;font-size:22px">New inquiry for ${params.facilityName}</h2>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">Someone submitted an inquiry through your listing on The Care Audit. Their contact details are below.</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+<tr style="background:#f9fafb"><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#6b7280;width:120px">Name</td><td style="padding:10px 16px;font-size:14px;color:#111827">${params.submitterName}</td></tr>
+<tr><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#6b7280">Email</td><td style="padding:10px 16px;font-size:14px;color:#111827"><a href="mailto:${params.submitterEmail}" style="color:#2563EB;text-decoration:none">${params.submitterEmail}</a></td></tr>
+${params.submitterPhone ? `<tr style="background:#f9fafb"><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#6b7280">Phone</td><td style="padding:10px 16px;font-size:14px;color:#111827">${params.submitterPhone}</td></tr>` : ''}
+${params.message ? `<tr${params.submitterPhone ? '' : ' style="background:#f9fafb"'}><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#6b7280;vertical-align:top">Message</td><td style="padding:10px 16px;font-size:14px;color:#111827;white-space:pre-wrap">${params.message}</td></tr>` : ''}
+</table>
+<p style="color:#6b7280;font-size:13px;line-height:1.5;margin:0">This inquiry was submitted through The Care Audit listing for <strong>${params.facilityName}</strong>. Reply directly to the submitter at the email address above.</p>`;
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: params.facilityEmail,
+    subject: `New inquiry for ${params.facilityName} \u2014 The Care Audit`,
     html: emailLayout(content),
   });
 }

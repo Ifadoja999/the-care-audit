@@ -157,7 +157,7 @@ export default function ForFacilitiesPage() {
           {/* Success/Cancel banners */}
           {successBanner && (
             <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
-              Your subscription is active! Check your email for next steps.
+              Your free 7-day trial is active! Check your email for next steps.
             </div>
           )}
           {cancelBanner && (
@@ -309,6 +309,10 @@ export default function ForFacilitiesPage() {
                     ? 'Let families hear your side of the story.'
                     : 'Show families the best version of your facility.'}
                 </p>
+                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-4 py-1.5 text-sm font-medium text-green-800">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  Start free — no charge for 7 days
+                </div>
               </div>
 
               {showPremiumTiers ? (
@@ -333,7 +337,7 @@ export default function ForFacilitiesPage() {
                       disabled={checkoutLoading !== null}
                       className="mt-6 w-full rounded-xl bg-amber-500 py-3 font-semibold text-white transition-colors hover:bg-amber-600 disabled:opacity-50"
                     >
-                      {checkoutLoading === 'featured_verified' ? 'Loading...' : 'Start Monthly Subscription'}
+                      {checkoutLoading === 'featured_verified' ? 'Loading...' : 'Start Free 7-Day Trial'}
                     </button>
                   </div>
 
@@ -354,7 +358,7 @@ export default function ForFacilitiesPage() {
                       disabled={checkoutLoading !== null}
                       className="mt-6 w-full rounded-xl bg-gray-800 py-3 font-semibold text-white transition-colors hover:bg-gray-900 disabled:opacity-50"
                     >
-                      {checkoutLoading === 'verified_profile' ? 'Loading...' : 'Start Monthly Subscription'}
+                      {checkoutLoading === 'verified_profile' ? 'Loading...' : 'Start Free 7-Day Trial'}
                     </button>
                   </div>
                 </div>
@@ -377,7 +381,7 @@ export default function ForFacilitiesPage() {
                       disabled={checkoutLoading !== null}
                       className="mt-6 w-full rounded-xl bg-gray-800 py-3 font-semibold text-white transition-colors hover:bg-gray-900 disabled:opacity-50"
                     >
-                      {checkoutLoading === 'facility_response' ? 'Loading...' : 'Start Monthly Subscription'}
+                      {checkoutLoading === 'facility_response' ? 'Loading...' : 'Start Free 7-Day Trial'}
                     </button>
                   </div>
                 </div>
@@ -487,7 +491,7 @@ export default function ForFacilitiesPage() {
         {/* Success/Cancel banners */}
         {successBanner && (
           <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
-            Your subscription is active! Check your email for next steps.
+            Your free 7-day trial is active! Check your email for next steps.
           </div>
         )}
         {cancelBanner && (
