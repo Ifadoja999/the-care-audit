@@ -308,16 +308,16 @@ export default function AssistedLivingVsMemoryCarePage() {
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               {[
-                { code: 'FL', name: 'Florida' },
-                { code: 'TX', name: 'Texas' },
-                { code: 'CA', name: 'California' },
-                { code: 'NY', name: 'New York' },
-                { code: 'IL', name: 'Illinois' },
-                { code: 'PA', name: 'Pennsylvania' },
-              ].map(({ code, name }) => (
+                { slug: 'florida', name: 'Florida' },
+                { slug: 'texas', name: 'Texas' },
+                { slug: 'california', name: 'California' },
+                { slug: 'new-york', name: 'New York' },
+                { slug: 'illinois', name: 'Illinois' },
+                { slug: 'pennsylvania', name: 'Pennsylvania' },
+              ].map(({ slug, name }) => (
                 <Link
-                  key={code}
-                  href={`/${code.toLowerCase()}`}
+                  key={slug}
+                  href={`/${slug}`}
                   className="rounded-full border border-accent px-3 py-1 text-sm text-accent hover:bg-accent hover:text-white transition-colors"
                 >
                   {name}
