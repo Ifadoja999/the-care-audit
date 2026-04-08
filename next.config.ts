@@ -89,6 +89,25 @@ const nextConfig: NextConfig = {
       ['minnesota/saint-anthony', 'minnesota/st-anthony'],
     ];
 
+    // 2-letter state abbreviation → full state slug redirects
+    // Safety net: any link using /tx, /fl, /ca etc. redirects to /texas, /florida, /california
+    // This prevents future content from causing 404s if state abbreviations are accidentally used.
+    const stateAbbrevRedirects = [
+      ['al', 'alabama'], ['ak', 'alaska'], ['az', 'arizona'], ['ar', 'arkansas'],
+      ['ca', 'california'], ['co', 'colorado'], ['ct', 'connecticut'], ['dc', 'district-of-columbia'],
+      ['de', 'delaware'], ['fl', 'florida'], ['ga', 'georgia'], ['hi', 'hawaii'],
+      ['id', 'idaho'], ['il', 'illinois'], ['in', 'indiana'], ['ia', 'iowa'],
+      ['ks', 'kansas'], ['ky', 'kentucky'], ['la', 'louisiana'], ['me', 'maine'],
+      ['md', 'maryland'], ['ma', 'massachusetts'], ['mi', 'michigan'], ['mn', 'minnesota'],
+      ['ms', 'mississippi'], ['mo', 'missouri'], ['mt', 'montana'], ['ne', 'nebraska'],
+      ['nv', 'nevada'], ['nh', 'new-hampshire'], ['nj', 'new-jersey'], ['nm', 'new-mexico'],
+      ['ny', 'new-york'], ['nc', 'north-carolina'], ['nd', 'north-dakota'], ['oh', 'ohio'],
+      ['ok', 'oklahoma'], ['or', 'oregon'], ['pa', 'pennsylvania'], ['ri', 'rhode-island'],
+      ['sc', 'south-carolina'], ['sd', 'south-dakota'], ['tn', 'tennessee'], ['tx', 'texas'],
+      ['ut', 'utah'], ['vt', 'vermont'], ['va', 'virginia'], ['wa', 'washington'],
+      ['wv', 'west-virginia'], ['wi', 'wisconsin'], ['wy', 'wyoming'],
+    ];
+
     return [
       // Non-www → www redirect
       {
@@ -97,6 +116,19 @@ const nextConfig: NextConfig = {
         destination: 'https://www.thecareaudit.com/:path*',
         permanent: true,
       },
+      // State abbreviation → full state name redirects (e.g. /tx → /texas)
+      ...stateAbbrevRedirects.flatMap(([abbrev, fullSlug]) => [
+        {
+          source: `/${abbrev}`,
+          destination: `/${fullSlug}`,
+          permanent: true,
+        },
+        {
+          source: `/${abbrev}/:rest*`,
+          destination: `/${fullSlug}/:rest*`,
+          permanent: true,
+        },
+      ]),
       // Sitemap XML → sitemap index (fixes GSC 404 on /sitemap.xml)
       {
         source: '/sitemap.xml',
