@@ -68,7 +68,7 @@ const CITY_ABBREVIATION_MAP: Record<string, Record<string, string>> = {
     'harrison-twp': 'harrison-township',
     'kimball-twp': 'kimball-township',
     'van-buren-twp': 'van-buren-township',
-    'redford-charter-twp': 'redford-charter-township',
+    'redford-charter-twp': 'redford',
     'chesterfield-twp': 'chesterfield-township',
     'macomb-twp': 'macomb-township',
     'madison-hts': 'madison-heights',

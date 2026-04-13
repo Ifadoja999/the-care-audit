@@ -66,6 +66,10 @@ const nextConfig: NextConfig = {
       ['idaho/idaho-falls/gables-of-idaho-falls-assisted-living-amp-memory-care', 'idaho/idaho-falls/gables-of-idaho-falls-assisted-living-memory-care'],
       // Michigan: facility page with concatenated city
       ['michigan/flatrock/marybrook-residence', 'michigan/flat-rock/marybrook-residence'],
+      // Michigan: facility page with embedded ampersand (no hyphens) - "S&D" → "sampd" artifact
+      ['michigan/caro/sampd-senior-living-home', 'michigan/caro/sd-senior-living-home'],
+      // Michigan: Redford Charter Township slug → canonical city slug
+      ['michigan/redford-charter-twp/the-orchards-at-redford-village', 'michigan/redford/the-orchards-at-redford-village'],
       // Michigan: facility pages under twp-abbreviated cities
       ['michigan/delta-twp/the-courtyard-at-delta', 'michigan/delta-township/the-courtyard-at-delta'],
       ['michigan/clinton-twp/caring-professionals-afc-home', 'michigan/clinton-township/caring-professionals-afc-home'],
