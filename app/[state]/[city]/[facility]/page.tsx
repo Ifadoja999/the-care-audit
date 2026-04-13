@@ -255,6 +255,9 @@ export default async function FacilityPage({ params }: Props) {
               </>
             )}
           </div>
+          <p className="mt-2 text-xs text-gray-400">
+            Inspection data is sourced from official state health department portals and refreshed on a rolling schedule. It may not reflect inspections published after the last data sync.
+          </p>
         </div>
 
         {/* 3. Photo Gallery — Tier 1 only */}
