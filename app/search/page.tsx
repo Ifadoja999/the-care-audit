@@ -75,7 +75,7 @@ export default async function SearchPage({ searchParams }: Props) {
                       <h2 className="text-lg font-semibold text-navy">
                         {toTitleCase(facility.facility_name)}
                       </h2>
-                      <ViolationCountBadge totalViolations={facility.total_violations} size="sm" />
+                      <ViolationCountBadge totalViolations={facility.total_violations} size="sm" state={facility.state} />
                     </div>
                     <p className="mt-0.5 text-sm text-gray-500">
                       {displayCity(facility.city)}, {facility.state}
