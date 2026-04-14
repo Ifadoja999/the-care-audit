@@ -494,6 +494,19 @@ export default async function FacilityPage({ params }: Props) {
                 </li>
               ))}
             </ul>
+            {stateCode === 'TX' && (
+              <p className="mt-2 text-xs text-gray-500">
+                * Texas violation counts reflect HHSC complaint investigation citations only. For comprehensive inspection data, visit the{' '}
+                <a
+                  href="https://tulip.hhs.texas.gov"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  Texas TULIP portal
+                </a>.
+              </p>
+            )}
           </div>
         )}
 

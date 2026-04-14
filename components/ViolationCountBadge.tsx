@@ -31,7 +31,6 @@ export default function ViolationCountBadge({ totalViolations, size = 'md', stat
       >
         <HelpCircle className={isSm ? 'h-3.5 w-3.5' : 'h-4 w-4'} />
         Data pending
-        {txIndicator}
       </span>
     );
   }
