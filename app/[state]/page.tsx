@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getAllStates, getAllCitiesByState, getFacilitiesByState, getFeaturedFacilities, getTopFacilitiesByState } from '@/lib/queries';
+import { getAllStates, getAllCitiesByState, getFacilitiesByState, getFeaturedFacilities, getTopFacilitiesByState, getTopViolationTypesByState } from '@/lib/queries';
 import {
   slugToStateCode,
   stateCodeToName,
@@ -44,11 +44,12 @@ export default async function StatePage({ params }: Props) {
 
   const stateName = stateCodeToName(stateCode);
 
-  const [facilities, cities, featured, topFacilities] = await Promise.all([
+  const [facilities, cities, featured, topFacilities, topViolationTypes] = await Promise.all([
     getFacilitiesByState(stateCode),
     getAllCitiesByState(stateCode),
     getFeaturedFacilities(stateCode),
-    getTopFacilitiesByState(stateCode, 5),
+    getTopFacilitiesByState(stateCode, 10),
+    getTopViolationTypesByState(stateCode, 5),
   ]);
 
   if (facilities.length === 0) notFound();
@@ -58,6 +59,10 @@ export default async function StatePage({ params }: Props) {
   const totalCitations = facilities.reduce((sum, f) => sum + (f.total_violations ?? 0), 0);
   const violationCount = facilities.filter(f => f.total_violations !== null && f.total_violations > 0).length;
   const cleanCount = facilities.filter(f => f.total_violations === 0).length;
+  const inspectedCount = facilities.filter(f => f.total_violations !== null).length;
+  const avgViolations = inspectedCount > 0
+    ? (totalCitations / inspectedCount).toFixed(1)
+    : null;
   const agencyName = STATE_AGENCY[stateCode] ?? `${stateName} Department of Health`;
 
   const breadcrumbItems = [
@@ -129,6 +134,83 @@ export default async function StatePage({ params }: Props) {
             )}
           </div>
         </div>
+
+        {/* Inspection Summary Comparison Table */}
+        {hasInspectionData && (
+          <div className="mt-8">
+            <h2 className="mb-3 text-xl font-semibold text-gray-900">
+              Inspection Snapshot: {stateName}
+            </h2>
+            <div className="overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-sm">
+              <table className="w-full text-sm">
+                <caption className="sr-only">
+                  Key inspection statistics for assisted living facilities in {stateName}
+                </caption>
+                <thead>
+                  <tr className="border-b border-warm-200 bg-warm-50">
+                    <th scope="col" className="px-5 py-3 text-left font-semibold text-gray-700">
+                      Metric
+                    </th>
+                    <th scope="col" className="px-5 py-3 text-right font-semibold text-gray-700">
+                      {stateName}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-warm-100">
+                  <tr>
+                    <td className="px-5 py-3 text-gray-600">Total Licensed Facilities</td>
+                    <td className="px-5 py-3 text-right font-medium text-gray-900">{total.toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-5 py-3 text-gray-600">Facilities with Violations on Record</td>
+                    <td className="px-5 py-3 text-right font-medium text-gray-900">
+                      {violationCount.toLocaleString()}
+                      {inspectedCount > 0 && (
+                        <span className="ml-1.5 text-xs text-gray-400">
+                          ({Math.round((violationCount / inspectedCount) * 100)}%)
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-5 py-3 text-gray-600">Facilities with Clean Inspection Records</td>
+                    <td className="px-5 py-3 text-right font-medium text-gray-900">
+                      {cleanCount.toLocaleString()}
+                      {inspectedCount > 0 && (
+                        <span className="ml-1.5 text-xs text-gray-400">
+                          ({Math.round((cleanCount / inspectedCount) * 100)}%)
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  {avgViolations !== null && (
+                    <tr>
+                      <td className="px-5 py-3 text-gray-600">Average Violations per Facility</td>
+                      <td className="px-5 py-3 text-right font-medium text-gray-900">{avgViolations}</td>
+                    </tr>
+                  )}
+                  {topViolationTypes.length > 0 && (
+                    <tr>
+                      <td className="px-5 py-3 align-top text-gray-600">Most Common Violation Codes</td>
+                      <td className="px-5 py-3 text-right text-gray-900">
+                        <ul className="space-y-0.5">
+                          {topViolationTypes.map(({ violation_code, count }) => (
+                            <li key={violation_code} className="flex items-center justify-end gap-2">
+                              <span className="font-medium">{violation_code}</span>
+                              <span className="rounded-full bg-warm-100 px-2 py-0.5 text-xs text-gray-500">
+                                {count}×
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Featured Facilities */}
         {featured.length > 0 && (
@@ -236,28 +318,41 @@ export default async function StatePage({ params }: Props) {
             <h2 className="mb-4 text-xl font-semibold text-gray-900">
               Most-Reviewed Facilities in {stateName}
             </h2>
-            <ul className="divide-y divide-warm-100 rounded-2xl border border-warm-200 bg-white shadow-sm">
-              {topFacilities.map((f) => (
-                <li key={f.slug}>
-                  <Link
-                    href={`/${f.slug}`}
-                    className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-warm-50"
-                  >
-                    <div className="min-w-0">
-                      <span className="block font-medium text-gray-800">
-                        {toTitleCase(f.facility_name)}
-                      </span>
-                      <span className="text-sm text-gray-500">{displayCity(f.city)}</span>
-                    </div>
-                    {f.total_violations !== null && f.total_violations > 0 && (
-                      <span className="ml-4 shrink-0 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
-                        {f.total_violations} violation{f.total_violations === 1 ? '' : 's'}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-sm">
+              <table className="w-full text-sm">
+                <caption className="sr-only">
+                  Facilities in {stateName} ranked by number of documented violations
+                </caption>
+                <thead>
+                  <tr className="border-b border-warm-200 bg-warm-50">
+                    <th scope="col" className="px-5 py-3 text-left font-semibold text-gray-700">Facility</th>
+                    <th scope="col" className="px-5 py-3 text-left font-semibold text-gray-700">City</th>
+                    <th scope="col" className="px-5 py-3 text-right font-semibold text-gray-700">Violations</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-warm-100">
+                  {topFacilities.map((f) => (
+                    <tr key={f.slug} className="transition-colors hover:bg-warm-50">
+                      <td className="px-5 py-3">
+                        <Link href={`/${f.slug}`} className="font-medium text-navy hover:underline">
+                          {toTitleCase(f.facility_name)}
+                        </Link>
+                      </td>
+                      <td className="px-5 py-3 text-gray-500">{displayCity(f.city)}</td>
+                      <td className="px-5 py-3 text-right">
+                        {f.total_violations !== null && f.total_violations > 0 ? (
+                          <span className="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                            {f.total_violations}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

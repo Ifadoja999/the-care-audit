@@ -296,6 +296,40 @@ export async function getTopFacilitiesByState(
   return (data as TopFacility[]) ?? [];
 }
 
+export interface ViolationTypeStat {
+  violation_code: string;
+  count: number;
+}
+
+export async function getTopViolationTypesByState(
+  stateCode: string,
+  limit = 5
+): Promise<ViolationTypeStat[]> {
+  const supabase = createServerClient();
+
+  // Pull a sample of violations for this state via an inner join on facilities.
+  // 2 000-row cap keeps build-time cost bounded; enough to identify the top codes.
+  const { data, error } = await supabase
+    .from('violations')
+    .select('violation_code, facilities!inner(state, facility_status)')
+    .eq('facilities.state', stateCode.toUpperCase())
+    .eq('facilities.facility_status', 'active')
+    .limit(2000);
+
+  if (error || !data || data.length === 0) return [];
+
+  const counts: Record<string, number> = {};
+  for (const row of data as Array<{ violation_code: string }>) {
+    const code = row.violation_code?.trim();
+    if (code) counts[code] = (counts[code] ?? 0) + 1;
+  }
+
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([violation_code, count]) => ({ violation_code, count }));
+}
+
 export interface RelatedFacility {
   facility_name: string;
   slug: string;

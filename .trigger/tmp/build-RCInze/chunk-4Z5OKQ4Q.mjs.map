@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../src/trigger/enrichment/configs/index.ts"],
+  "mappings": ";;;;;;;;;;;;;;;AAAA;AAKA,IAAM,UAAiD;AAAA,EACrD,IAAI;AAAA,EACJ,IAAI;AAAA,EACJ,IAAI;AACN;AAEO,SAAS,UAAU,WAA0C;AAClE,QAAM,SAAS,QAAQ,SAAS;AAChC,MAAI,CAAC,QAAQ;AACX,UAAM,IAAI,MAAM,mCAAmC,SAAS,EAAE;AAAA,EAChE;AACA,SAAO;AACT;AANgB;",
+  "names": []
+}

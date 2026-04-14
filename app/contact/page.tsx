@@ -9,7 +9,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.c
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Get in touch with The Care Audit team for questions, data corrections, sponsorship, or partnership inquiries.',
+    'Have a question or need to report a data issue? Contact The Care Audit team for questions, corrections, sponsorship, or partnership inquiries. We respond quickly.',
   alternates: { canonical: `${SITE_URL}/contact` },
 };
 

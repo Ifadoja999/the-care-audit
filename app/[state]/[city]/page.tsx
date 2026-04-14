@@ -7,7 +7,7 @@ import {
   stateCodeToName,
   slugToCity,
 } from '@/lib/states';
-import { generateCityMetadata, breadcrumbJsonLd, collectionPageJsonLd } from '@/lib/seo';
+import { generateCityMetadata, breadcrumbJsonLd, collectionPageJsonLd, cityFaqPageJsonLd } from '@/lib/seo';
 import { toTitleCase, displayCityFromDb } from '@/lib/utils';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -86,6 +86,10 @@ export default async function CityPage({ params }: Props) {
     ? displayCityFromDb(facilities[0].city)
     : cityFromSlug;
 
+  const hasInspectionData = facilities.some(f => f.total_violations !== null);
+  const violationCount = facilities.filter(f => f.total_violations !== null && f.total_violations > 0).length;
+  const cleanCount = facilities.filter(f => f.total_violations === 0).length;
+
   const breadcrumbItems = [
     { name: 'Home', href: '/' },
     { name: stateName, href: `/${stateSlug}` },
@@ -112,6 +116,20 @@ export default async function CityPage({ params }: Props) {
             description: `Inspection reports and violation data for ${facilities.length} assisted living facilities in ${cityName}, ${stateName}.`,
             url: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com'}/${stateSlug}/${citySlug}`,
             count: facilities.length,
+          })),
+        }}
+      />
+      {/* Schema.org FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(cityFaqPageJsonLd({
+            cityName,
+            stateName,
+            facilityCount: facilities.length,
+            violationCount,
+            cleanCount,
+            hasInspectionData,
           })),
         }}
       />
@@ -220,6 +238,50 @@ export default async function CityPage({ params }: Props) {
           stateSlug={stateSlug}
           citySlug={citySlug}
         />
+
+        {/* FAQ Section */}
+        <div className="mt-12 rounded-2xl border border-warm-200 bg-white p-8 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Frequently Asked Questions About Assisted Living in {cityName}, {stateName}
+          </h2>
+          <dl className="mt-6 divide-y divide-warm-100">
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                How many assisted living facilities are in {cityName}, {stateName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                {cityName}, {stateName} has {facilities.length.toLocaleString()} licensed assisted living {facilities.length === 1 ? 'facility' : 'facilities'} listed in The Care Audit.
+                {hasInspectionData && (
+                  <> Of these, {violationCount.toLocaleString()} have documented violations on file, and {cleanCount.toLocaleString()} have clean inspection records.</>
+                )}
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                How do I find inspection reports for assisted living facilities in {cityName}?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                Click any facility above to view its full inspection history, violation records, and AI-generated summary. All data is sourced directly from official {stateName} state health department inspection records.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                Are assisted living facilities in {cityName} state-regulated?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                Yes. All assisted living facilities in {cityName}, {stateName} are licensed and inspected by the {stateName} state health authority. Inspections are typically conducted on an annual unannounced basis, with additional inspections triggered by complaints or incidents.
+              </dd>
+            </div>
+            <div className="py-5">
+              <dt className="text-base font-medium text-gray-900">
+                What information does The Care Audit provide for {cityName} facilities?
+              </dt>
+              <dd className="mt-2 text-sm leading-relaxed text-gray-600">
+                For each facility in {cityName}, The Care Audit provides the full inspection citation history, violation counts, facility address and contact information, license status, and — where available — an AI-generated plain-English summary of the inspection findings.
+              </dd>
+            </div>
+          </dl>
+        </div>
 
         {/* Internal linking: back to state directory */}
         <div className="mt-10">

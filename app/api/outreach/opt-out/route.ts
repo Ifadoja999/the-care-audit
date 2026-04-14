@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const supabase = createServerClient();
   const { error } = await supabase
     .from('facilities')
-    .update({ outreach_opt_out: true })
+    .update({ outreach_opt_out: true, opted_out_at: new Date().toISOString() })
     .eq('id', facilityId);
 
   if (error) {

@@ -36,6 +36,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: '#1a2b4a',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -43,6 +47,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Preconnect to Supabase storage for faster facility photo loads (LCP) */}
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <>
+            <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin} />
+            <link rel="dns-prefetch" href={new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin} />
+          </>
+        )}
+      </head>
       <body className={`${heading.variable} ${body.variable} font-sans`}>
         {children}
         {process.env.NEXT_PUBLIC_GA_ID && (

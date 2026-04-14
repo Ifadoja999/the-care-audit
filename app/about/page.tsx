@@ -7,7 +7,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.c
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'Learn about The Care Audit — a free directory of assisted living facility inspection reports in plain English across all 50 states.',
+    'The Care Audit is a free directory of assisted living facility inspection reports across all 50 states — made easy to understand with AI summaries. Learn about our mission.',
   alternates: { canonical: `${SITE_URL}/about` },
 };
 

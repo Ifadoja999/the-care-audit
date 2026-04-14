@@ -26,26 +26,20 @@ h1, h2, h3 {
   font-family: var(--font-heading);
 }
 
-/* Fade-in animation for page content */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Fade-in animation for page content — opacity only (no transform) to minimize LCP impact */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .animate-fade-in {
-  animation: fadeInUp 0.5s ease-out both;
+  animation: fadeIn 0.2s ease-out both;
 }
 
 .animate-fade-in-delay {
-  animation: fadeInUp 0.5s ease-out 0.15s both;
+  animation: fadeIn 0.2s ease-out 0.1s both;
 }
 
 .animate-fade-in-delay-2 {
-  animation: fadeInUp 0.5s ease-out 0.3s both;
+  animation: fadeIn 0.2s ease-out 0.2s both;
 }

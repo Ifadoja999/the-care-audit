@@ -2,7 +2,6 @@ import { schedules, task, logger, wait } from "@trigger.dev/sdk";
 import { supabase } from "./lib/supabase";
 import { pipelineQueue } from "./lib/queues";
 import { logAutomation } from "./lib/log";
-import { sendStateOutreach } from "./outreach-emails";
 import { checkViolationTierChanges } from "./tier-change-emails";
 import { detectFacilityChanges } from "./facility-detection";
 import { regenerateChangedSummaries } from "./ai-regeneration";
@@ -87,13 +86,6 @@ export const runStatePipeline = task({
     // 4c: Check violation tier changes for sponsored facilities
     logger.info("Checking violation tier changes...");
     await checkViolationTierChanges.triggerAndWait({
-      stateCode: payload.stateCode,
-      stateName: payload.stateName,
-    });
-
-    // 4d: Run outreach for this state (if activated)
-    logger.info("Running outreach check...");
-    await sendStateOutreach.trigger({
       stateCode: payload.stateCode,
       stateName: payload.stateName,
     });

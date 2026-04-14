@@ -20,6 +20,15 @@ interface FacilityData {
   city: string;
   state: string;
   tour_url?: string | null;
+  lead_count?: number;
+}
+
+interface LeadRecord {
+  submitter_name: string;
+  submitter_email: string;
+  submitter_phone: string | null;
+  message: string | null;
+  created_at: string;
 }
 
 interface PhotoSlot {
@@ -87,6 +96,9 @@ export default function OnboardPage() {
   const [description, setDescription] = useState('');
   const [tourUrl, setTourUrl] = useState('');
 
+  // Lead stats
+  const [leadStats, setLeadStats] = useState<{ count: number; recent: LeadRecord[] } | null>(null);
+
   // Photo management — 4 slots
   const [photos, setPhotos] = useState<PhotoSlot[]>([
     { url: null, uploading: false },
@@ -108,6 +120,20 @@ export default function OnboardPage() {
         setContactEmail(data.contact_email || '');
         setDescription(data.facility_description || '');
         setTourUrl(data.tour_url || '');
+
+        // Fetch lead stats for Tier 1 and Tier 2 facilities with a contact email
+        const isTier1or2 = data.sponsor_tier === 'featured_verified' || data.sponsor_tier === 'verified_profile';
+        if (isTier1or2 && data.contact_email && data.id) {
+          try {
+            const leadsRes = await fetch(`/api/facility/${data.id}/leads-count?token=${token}`);
+            if (leadsRes.ok) {
+              const leadsData = await leadsRes.json();
+              setLeadStats(leadsData);
+            }
+          } catch {
+            // Non-critical — silently ignore
+          }
+        }
 
         // Load existing photos from Supabase Storage
         if (data.sponsor_tier === 'featured_verified' && data.slug) {
@@ -430,6 +456,64 @@ export default function OnboardPage() {
             {submitting ? 'Saving...' : 'Save Profile'}
           </button>
         </form>
+
+        {/* Inquiries section — Tier 1 and Tier 2 with contact_email set */}
+        {(facility?.sponsor_tier === 'featured_verified' || facility?.sponsor_tier === 'verified_profile') &&
+          facility?.contact_email &&
+          leadStats !== null && (
+          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
+              Inquiries
+            </h2>
+            <p className="mt-0.5 text-sm text-gray-500">
+              Visitors who contact your facility through The Care Audit.
+            </p>
+
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+              <span className="text-2xl font-bold text-blue-700">{leadStats.count}</span>
+              <span className="text-sm text-blue-600">total {leadStats.count === 1 ? 'inquiry' : 'inquiries'}</span>
+            </div>
+
+            {leadStats.recent.length > 0 ? (
+              <div className="mt-6 space-y-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Recent Inquiries</h3>
+                <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white overflow-hidden">
+                  {leadStats.recent.map((lead, i) => (
+                    <li key={i} className="px-4 py-4">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <p className="font-medium text-gray-900">{lead.submitter_name}</p>
+                          <p className="text-sm text-blue-600">
+                            <a href={`mailto:${lead.submitter_email}`} className="hover:underline">
+                              {lead.submitter_email}
+                            </a>
+                          </p>
+                          {lead.submitter_phone && (
+                            <p className="text-sm text-gray-500">{lead.submitter_phone}</p>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400 shrink-0">
+                          {new Date(lead.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                      {lead.message && (
+                        <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                          &ldquo;{lead.message}&rdquo;
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="mt-4 text-sm text-gray-500">No inquiries yet. They will appear here when visitors contact your facility.</p>
+            )}
+          </div>
+        )}
       </main>
       <Footer />
     </div>
