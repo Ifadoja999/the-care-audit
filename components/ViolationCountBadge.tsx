@@ -9,6 +9,16 @@ interface Props {
 export default function ViolationCountBadge({ totalViolations, size = 'md', state }: Props) {
   const isSm = size === 'sm';
 
+  const txIndicator = state === 'TX' ? (
+    <span
+      className={`inline-flex items-center gap-0.5 ${isSm ? 'text-[10px]' : 'text-xs'} font-normal text-amber-700`}
+      title="Texas: reflects complaint investigation citations only, not comprehensive inspection violations"
+    >
+      <Info className={isSm ? 'h-3 w-3' : 'h-3.5 w-3.5'} />
+      complaints only
+    </span>
+  ) : null;
+
   // NULL = no inspection data available for this state
   if (totalViolations === null) {
     return (
@@ -21,6 +31,7 @@ export default function ViolationCountBadge({ totalViolations, size = 'md', stat
       >
         <HelpCircle className={isSm ? 'h-3.5 w-3.5' : 'h-4 w-4'} />
         Data pending
+        {txIndicator}
       </span>
     );
   }
@@ -31,20 +42,12 @@ export default function ViolationCountBadge({ totalViolations, size = 'md', stat
         className={`inline-flex items-center gap-1 ${
           isSm ? 'text-xs' : 'text-sm'
         } text-gray-500`}
-        aria-label="No violations cited"
+        aria-label={state === 'TX' ? 'No violations cited — complaint investigations only' : 'No violations cited'}
         role="img"
       >
         <CheckCircle2 className={isSm ? 'h-3.5 w-3.5' : 'h-4 w-4'} />
         No violations
-        {state === 'TX' && (
-          <span
-            className={`inline-flex items-center gap-0.5 ${isSm ? 'text-[10px]' : 'text-xs'} font-normal text-amber-700`}
-            title="Texas: reflects complaint investigation citations only, not comprehensive inspection violations"
-          >
-            <Info className={isSm ? 'h-3 w-3' : 'h-3.5 w-3.5'} />
-            complaints only
-          </span>
-        )}
+        {txIndicator}
       </span>
     );
   }
@@ -54,19 +57,11 @@ export default function ViolationCountBadge({ totalViolations, size = 'md', stat
       className={`inline-flex items-center gap-1 ${
         isSm ? 'text-xs' : 'text-sm'
       } font-medium text-gray-600`}
-      aria-label={`${totalViolations} violation${totalViolations === 1 ? '' : 's'} cited`}
+      aria-label={`${totalViolations} violation${totalViolations === 1 ? '' : 's'} cited${state === 'TX' ? ' — complaint investigations only' : ''}`}
       role="img"
     >
       {totalViolations} violation{totalViolations === 1 ? '' : 's'}
-      {state === 'TX' && (
-        <span
-          className={`inline-flex items-center gap-0.5 ${isSm ? 'text-[10px]' : 'text-xs'} font-normal text-amber-700`}
-          title="Texas: reflects complaint investigation citations only, not comprehensive inspection violations"
-        >
-          <Info className={isSm ? 'h-3 w-3' : 'h-3.5 w-3.5'} />
-          complaints only
-        </span>
-      )}
+      {txIndicator}
     </span>
   );
 }
