@@ -15,6 +15,7 @@ interface Props {
 
 export default function CityFacilitiesTable({ facilities, stateSlug, citySlug }: Props) {
   const [sortBy, setSortBy] = useState<SortOption>('az');
+  const isTX = facilities.length > 0 && facilities[0].state === 'TX';
 
   const sorted = [...facilities].sort((a, b) => {
     // Sponsored always first
@@ -66,7 +67,7 @@ export default function CityFacilitiesTable({ facilities, stateSlug, citySlug }:
                 Facility Name
               </th>
               <th className="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Violations
+                Violations{isTX && <sup className="ml-0.5 text-amber-600">*</sup>}
               </th>
               <th className="hidden px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 sm:table-cell">
                 Last Inspection
@@ -122,7 +123,10 @@ export default function CityFacilitiesTable({ facilities, stateSlug, citySlug }:
                     {facility.total_violations === null ? (
                       <span className="text-gray-400">—</span>
                     ) : (
-                      facility.total_violations
+                      <>
+                        {facility.total_violations}
+                        {isTX && <sup className="ml-0.5 text-[10px] text-amber-600">*</sup>}
+                      </>
                     )}
                   </td>
                   <td className="hidden px-5 py-3.5 text-gray-500 sm:table-cell">
@@ -134,6 +138,19 @@ export default function CityFacilitiesTable({ facilities, stateSlug, citySlug }:
           </tbody>
         </table>
       </div>
+      {isTX && (
+        <p className="mt-2 text-xs text-gray-500">
+          * Texas violation counts reflect HHSC complaint investigation citations only. For comprehensive inspection data, visit the{' '}
+          <a
+            href="https://tulip.hhs.texas.gov"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Texas TULIP portal
+          </a>.
+        </p>
+      )}
     </>
   );
 }
