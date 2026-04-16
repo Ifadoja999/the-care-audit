@@ -69,14 +69,10 @@ export function generateFacilityMetadata(facility: Facility): Metadata {
 
   const url = `${SITE_URL}/${facility.slug}`;
 
-  // Thin pages (no enrichment data at all) should not be indexed
-  const isThinPage = facility.total_violations === null && !facility.ai_summary;
-
   return {
     title,
     description,
     alternates: { canonical: url },
-    ...(isThinPage ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       title,
       description,
