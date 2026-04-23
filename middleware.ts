@@ -79,6 +79,7 @@ const CITY_ABBREVIATION_MAP: Record<string, Record<string, string>> = {
     'stignace': 'st-ignace',
     'flatrock': 'flat-rock',
     'l39anse': 'lanse',
+    'harperwoods': 'harper-woods',
   },
   // Ohio
   ohio: {
@@ -129,19 +130,6 @@ const CITY_ABBREVIATION_MAP: Record<string, Record<string, string>> = {
   minnesota: {
     'saint-anthony': 'st-anthony',
     'lake-st-croix-beach': 'lake-saint-croix-beach',
-  },
-  // Maryland
-  maryland: {
-    'st-leonard': 'saint-leonard',
-    'traceys-landing': 'tracys-landing',
-  },
-  // Missouri
-  missouri: {
-    'ofallon': 'o-fallon',
-  },
-  // Tennessee
-  tennessee: {
-    'mt-juliet': 'mount-juliet',
   },
 };
 
