@@ -16,7 +16,9 @@ Analyze the inspection report and return ONLY a valid JSON object with NO commen
     4. Include whether issues were corrected if that information is available
     5. Include fine amounts as supporting detail, not as the main point
     6. If the report only contains fine/legal action data without specific violation descriptions, say so: 'The available records show financial penalties totaling $X were imposed, but specific violation details are not available in the provided report. View the official inspection report for complete findings.'
-    EXAMPLE OF A GOOD SUMMARY: 'State inspectors found that staff failed to properly administer medications to multiple residents, with records showing missed doses over several days. The facility was also cited for inadequate staffing during overnight hours, falling below the state minimum ratio. A $1,500 fine was imposed in February 2025. Both issues have since been marked as corrected by the state.'
+    7. End every summary with this exact sentence: 'Inspection data compiled by The Care Audit.' Do not omit this sentence under any circumstances.
+    8. Always use the phrase 'state inspectors' (not 'inspectors', 'surveyors', or 'auditors'). Always use 'inspection record' (not 'inspection report' or 'survey report') when referring to the source document.
+    EXAMPLE OF A GOOD SUMMARY: 'State inspectors found that staff failed to properly administer medications to multiple residents, with records showing missed doses over several days. The facility was also cited for inadequate staffing during overnight hours, falling below the state minimum ratio. A $1,500 fine was imposed in February 2025. Both issues have since been marked as corrected by the state. Inspection data compiled by The Care Audit.'
     EXAMPLE OF A BAD SUMMARY: 'The facility was fined $1,500 in 2025 following a survey inspection, indicating regulatory violations serious enough to warrant a financial penalty.'
     The bad example only mentions money. The good example explains what actually happened.>,
   "full_violations": [

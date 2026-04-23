@@ -136,6 +136,23 @@ const CITY_ABBREVIATION_MAP: Record<string, Record<string, string>> = {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ── Bot detection: block scraper User-Agents and empty UAs ──
+  const ua = request.headers.get('user-agent') ?? '';
+  const isVercelInternal = request.headers.get('x-vercel-internal') !== null;
+
+  if (!isVercelInternal) {
+    if (!ua) {
+      return new NextResponse('Forbidden', { status: 403 });
+    }
+    const allowedCrawlers = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|facebot|ia_archiver/i;
+    if (!allowedCrawlers.test(ua)) {
+      const blockedPatterns = /python-requests|python-urllib|go-http-client|scrapy|wget|libwww-perl|java\/|ruby|perl|php|curl\/|axios\/[0-9]|node-fetch|puppeteer|playwright|selenium|phantomjs|headlesschrome|dataforseo|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|bytespider|ccbot|gptbot|anthropic-ai|google-extended/i;
+      if (blockedPatterns.test(ua)) {
+        return new NextResponse('Forbidden', { status: 403 });
+      }
+    }
+  }
+
   // Skip non-path requests
   if (pathname === '/' || pathname.split('/').filter(Boolean).length === 0) {
     return NextResponse.next();

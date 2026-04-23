@@ -372,6 +372,10 @@ export default async function FacilityPage({ params }: Props) {
             <p className="mt-2 leading-relaxed text-gray-700">
               {facility.ai_summary}
             </p>
+            <p className="mt-2 text-xs text-gray-400">
+              AI-generated summary &copy; {new Date().getFullYear()} ConvoLogic LLC / The Care Audit.
+              Unauthorized reproduction prohibited.
+            </p>
             <p className="mt-4 rounded-lg bg-amber-50 p-3 text-xs leading-relaxed text-amber-800">
               {stateCode === 'TX' ? (
                 <>
