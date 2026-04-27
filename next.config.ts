@@ -91,6 +91,63 @@ const nextConfig: NextConfig = {
       ['florida/saint-johns', 'florida/st-johns'],
       // Minnesota: saint-anthony → st-anthony (after merge)
       ['minnesota/saint-anthony', 'minnesota/st-anthony'],
+      // Michigan: missing township/abbreviation city variants
+      ['michigan/sterling-hts', 'michigan/sterling-heights'],
+      ['michigan/van-buren-twp', 'michigan/van-buren-township'],
+      ['michigan/harperwoods', 'michigan/harper-woods'],
+      ['michigan/harrison-twp', 'michigan/harrison-township'],
+      ['michigan/macomb-twp', 'michigan/macomb-township'],
+      ['michigan/bloomfield-twp', 'michigan/bloomfield-township'],
+      ['michigan/chesterfield-twp', 'michigan/chesterfield-township'],
+      // Idaho: state suffix in city
+      ['idaho/emmett-id', 'idaho/emmett'],
+      // Michigan: facility pages where city had bad slug + facility doesn't exist → send to city
+      ['michigan/harrison-twp/angelic-homes', 'michigan/harrison-township'],
+      ['michigan/bloomfield-twp/pitt', 'michigan/bloomfield-township'],
+      ['michigan/macomb-twp/milestones', 'michigan/macomb-township'],
+      ['michigan/chesterfield-twp/commonwealth-senior-living-at-new-baltimore', 'michigan/chesterfield-township'],
+      ['michigan/sterling-hts/chesley-drive', 'michigan/sterling-heights'],
+      // Michigan: 39-encoded (apostrophe artifact) facility slugs → city page (facility no longer in DB)
+      ['michigan/grandville/david39s-house-all-pine', 'michigan/grandville'],
+      ['michigan/caro/jamie39s-house', 'michigan/caro'],
+      ['michigan/detroit/patterson39s-home', 'michigan/detroit'],
+      ['michigan/redford/amen39s-care', 'michigan/redford'],
+      ['michigan/ypsilanti/4-c39s-group-home', 'michigan/ypsilanti'],
+      ['michigan/romulus/henry39s-inc-paradise-home', 'michigan/romulus'],
+      ['michigan/grand-rapids/nano39s-care', 'michigan/grand-rapids'],
+      ['michigan/grand-rapids/st-ann39s-home', 'michigan/grand-rapids'],
+      ['michigan/muskegon/mary39s-house', 'michigan/muskegon'],
+      ['michigan/niles/ammu39s', 'michigan/niles'],
+      ['michigan/detroit/l-and-v39s-adult-foster-home', 'michigan/detroit'],
+      ['michigan/holland/holland39s-hope', 'michigan/holland'],
+      ['michigan/detroit/gabriel39s-nest-iii-inc', 'michigan/detroit'],
+      ['michigan/farmington-hills/mom39s-house', 'michigan/farmington-hills'],
+      ['michigan/berrien-springs/sara39s', 'michigan/berrien-springs'],
+      ['michigan/detroit/mom39s-healing-hands-ii', 'michigan/detroit'],
+      ['michigan/inkster/rose39s-place-ii', 'michigan/inkster'],
+      ['michigan/edmore/mcbride-todd39s-place', 'michigan/edmore'],
+      // Michigan: amp-encoded (ampersand artifact) facility slugs → city page
+      ['michigan/northville/pomeroy-living-northville-assisted-amp-memory-care', 'michigan/northville'],
+      ['michigan/alma/arbor-grove-assisted-living-amp-memory-care', 'michigan/alma'],
+      ['michigan/detroit/g-amp-g-home', 'michigan/detroit'],
+      ['michigan/portland/portland-assisted-living-amp-memory-center', 'michigan/portland'],
+      ['michigan/portland/portland-assisted-living-amp-memory-manor', 'michigan/portland'],
+      ['michigan/harper-woods/eampm-house-of-love-amp-peace', 'michigan/harper-woods'],
+      ['michigan/sturgis/r-amp-r-adult-foster-care', 'michigan/sturgis'],
+      ['michigan/galesburg/e-amp-f-douglas-group-living', 'michigan/galesburg'],
+      ['michigan/saginaw/j-amp-m-family-group-llc', 'michigan/saginaw'],
+      ['michigan/benton-harbor/hope-love-amp-grace-am110401946', 'michigan/benton-harbor'],
+      ['michigan/midland/k-amp-k-quality-care-ii', 'michigan/midland'],
+      ['michigan/kalamazoo/a-amp-l-afc', 'michigan/kalamazoo'],
+      // Michigan: paulettes redirect (facility confirmed in DB with clean slug)
+      ['michigan/southfield/paulette39s-assisted-living', 'michigan/southfield/paulettes-assisted-living'],
+      // Idaho: amp-encoded facility slugs → correct slug (confirmed in DB)
+      ['idaho/nampa/r-amp-v-assisted-living-inc', 'idaho/nampa/r-v-assisted-living-inc'],
+      ['idaho/burley/home-amp-heart-assisted-living-llc', 'idaho/burley/home-heart-assisted-living-llc'],
+      // Tennessee: facility no longer in DB → city page
+      ['tennessee/mt-juliet/providence-place-of-mt-juliet', 'tennessee/mt-juliet'],
+      // Alaska: facility not in DB → city page
+      ['alaska/anchorage/brentwood-assisted-living', 'alaska/anchorage'],
     ];
 
     // 2-letter state abbreviation → full state slug redirects
@@ -139,6 +196,13 @@ const nextConfig: NextConfig = {
         destination: '/sitemap-index.xml',
         permanent: true,
       },
+      // Illinois: cities where all facilities are closed — redirect to state page
+      ...['bensenville', 'bradford', 'buffalo', 'flora', 'green-valley', 'hinsdale', 'moweaqua'].flatMap(city => [
+        { source: `/illinois/${city}`, destination: '/illinois', permanent: true },
+        { source: `/illinois/${city}/:facility*`, destination: '/illinois', permanent: true },
+      ]),
+      // Illinois/Idaho: facilities not in DB → state page
+      { source: '/illinois/ringwood/shepherd-premier-senior-living', destination: '/illinois', permanent: true },
       // Specific facility redirects FIRST (before city wildcards catch them)
       ...cityRedirects
         .filter(([oldPath]) => oldPath.split('/').length === 3)

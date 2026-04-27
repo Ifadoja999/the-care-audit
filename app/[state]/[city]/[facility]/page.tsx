@@ -44,6 +44,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = `${stateSlug}/${citySlug}/${facilitySlug}`;
   const data = await getFacilityBySlug(slug);
   if (!data) return {};
+  if (data.total_violations === null && !data.ai_summary) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
+    return {
+      robots: { index: false, follow: false },
+      alternates: { canonical: `${siteUrl}/${slug}` },
+    };
+  }
   return generateFacilityMetadata(data);
 }
 
@@ -81,10 +88,6 @@ export default async function FacilityPage({ params }: Props) {
 
   const facility = await getFacilityBySlug(slug);
   if (!facility) notFound();
-
-  // Thin pages have no audit data yet — return 404 so Google doesn't flag them
-  // as soft 404s. ISR will serve 200 again once data is populated.
-  if (facility.total_violations === null && !facility.ai_summary) notFound();
 
   const stateCode = slugToStateCode(stateSlug);
   const stateName = stateCode ? stateCodeToName(stateCode) : stateSlug;
