@@ -148,6 +148,8 @@ const nextConfig: NextConfig = {
       ['tennessee/mt-juliet/providence-place-of-mt-juliet', 'tennessee/mt-juliet'],
       // Alaska: facility not in DB → city page
       ['alaska/anchorage/brentwood-assisted-living', 'alaska/anchorage'],
+      // Michigan: amp-encoded facility slug → correct slug (confirmed in DB)
+      ['michigan/lansing/loving-care-amp-comfort-mjb-llc', 'michigan/lansing/loving-care-comfort-llc'],
     ];
 
     // 2-letter state abbreviation → full state slug redirects
@@ -197,12 +199,27 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Illinois: cities where all facilities are closed — redirect to state page
-      ...['bensenville', 'bradford', 'buffalo', 'flora', 'green-valley', 'hinsdale', 'moweaqua'].flatMap(city => [
+      ...['bensenville', 'bradford', 'buffalo', 'flora', 'green-valley', 'hinsdale', 'moweaqua', 'zion'].flatMap(city => [
         { source: `/illinois/${city}`, destination: '/illinois', permanent: true },
         { source: `/illinois/${city}/:facility*`, destination: '/illinois', permanent: true },
       ]),
       // Illinois/Idaho: facilities not in DB → state page
       { source: '/illinois/ringwood/shepherd-premier-senior-living', destination: '/illinois', permanent: true },
+      // Minnesota: cities with no active facilities — redirect to state page
+      ...['st-james', 'st-charles'].flatMap(city => [
+        { source: `/minnesota/${city}`, destination: '/minnesota', permanent: true },
+        { source: `/minnesota/${city}/:facility*`, destination: '/minnesota', permanent: true },
+      ]),
+      // Michigan: cities with no active facilities — redirect to state page
+      ...['st-louis'].flatMap(city => [
+        { source: `/michigan/${city}`, destination: '/michigan', permanent: true },
+        { source: `/michigan/${city}/:facility*`, destination: '/michigan', permanent: true },
+      ]),
+      // Maryland: cities with no active facilities — redirect to state page
+      ...['st-leonard', 'traceys-landing'].flatMap(city => [
+        { source: `/maryland/${city}`, destination: '/maryland', permanent: true },
+        { source: `/maryland/${city}/:facility*`, destination: '/maryland', permanent: true },
+      ]),
       // Specific facility redirects FIRST (before city wildcards catch them)
       ...cityRedirects
         .filter(([oldPath]) => oldPath.split('/').length === 3)
