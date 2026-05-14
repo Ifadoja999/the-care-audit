@@ -144,12 +144,37 @@ const nextConfig: NextConfig = {
       // Idaho: amp-encoded facility slugs → correct slug (confirmed in DB)
       ['idaho/nampa/r-amp-v-assisted-living-inc', 'idaho/nampa/r-v-assisted-living-inc'],
       ['idaho/burley/home-amp-heart-assisted-living-llc', 'idaho/burley/home-heart-assisted-living-llc'],
-      // Tennessee: facility no longer in DB → city page
-      ['tennessee/mt-juliet/providence-place-of-mt-juliet', 'tennessee/mt-juliet'],
+      // Tennessee: mt-juliet city has no active facilities → state page
+      ['tennessee/mt-juliet/providence-place-of-mt-juliet', 'tennessee'],
       // Alaska: facility not in DB → city page
       ['alaska/anchorage/brentwood-assisted-living', 'alaska/anchorage'],
       // Michigan: amp-encoded facility slug → correct slug (confirmed in DB)
       ['michigan/lansing/loving-care-amp-comfort-mjb-llc', 'michigan/lansing/loving-care-comfort-llc'],
+      // Michigan: city typos (battlecreek, chesterfield-townshp, van-bure-twp, city-of-marlette)
+      ['michigan/battlecreek', 'michigan/battle-creek'],
+      ['michigan/van-bure-twp', 'michigan/van-buren-township'],
+      ['michigan/city-of-marlette', 'michigan/marlette'],
+      ['michigan/chesterfield-townshp', 'michigan/chesterfield-township'],
+      // Michigan: facility pages with wrong city slug or wrong facility slug
+      ['michigan/battlecreek/faithdracut-llc', 'michigan/battle-creek/faithdracut-llc'],
+      ['michigan/chesterfield-townshp/kolarik-house', 'michigan/chesterfield-township/kolarik-house'],
+      // michigan/w-bloomfield-twp wildcard redirects to west-bloomfield-township but real slug is west-bloomfield
+      ['michigan/w-bloomfield-twp/maxwell-home', 'michigan/west-bloomfield/maxwell-home'],
+      // Michigan: 39-encoded apostrophe in D'adamo → clean slug
+      ['michigan/chelsea/jerry-and-alice-d39adamo-house', 'michigan/chelsea/jerry-and-alice-dadamo-house'],
+      // Michigan: amp-encoded facility slug → clean slug (confirmed in DB)
+      ['michigan/detroit/theharryampjeanetteweinberggreenhouses-at', 'michigan/detroit/theharryjeanetteweinberggreenhouses-at'],
+      // Michigan: facility not in DB → city page
+      ['michigan/berrien-springs/lampj-adult-foster-care-home', 'michigan/berrien-springs'],
+      // Maryland: old city slug (bryans-road) + old facility slug → real slug (bryan-s-road)
+      ['maryland/bryans-road/angels-heart-assisted-living-home-llc', 'maryland/bryan-s-road/lillys-place-indian-head'],
+      // Florida: city redirect wildcard sends port-st-lucie → port-saint-lucie but facility slug also changed
+      ['florida/port-st-lucie/wickshire-port-st-lucie', 'florida/port-saint-lucie/wickshire-port-saint-lucie'],
+      ['florida/port-saint-lucie/wickshire-port-st-lucie', 'florida/port-saint-lucie/wickshire-port-saint-lucie'],
+      // Illinois: facility not in DB → city page
+      ['illinois/grayslake/theresas-home-care-iii-llc', 'illinois/grayslake'],
+      // Illinois: stcharles wildcard chains to st-charles which has no facilities — short-circuit to state
+      ['illinois/stcharles/bickford-cottage-st-charles', 'illinois'],
     ];
 
     // 2-letter state abbreviation → full state slug redirects
@@ -199,19 +224,19 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Illinois: cities where all facilities are closed — redirect to state page
-      ...['bensenville', 'bradford', 'buffalo', 'flora', 'green-valley', 'hinsdale', 'moweaqua', 'zion'].flatMap(city => [
+      ...['bensenville', 'bradford', 'buffalo', 'chillicothe', 'crete', 'elizabeth', 'flora', 'green-valley', 'havana', 'hazel-crest', 'hinsdale', 'mc-henry', 'moweaqua', 'mt-vernon', 'paris', 'salem', 'st-charles', 'zion'].flatMap(city => [
         { source: `/illinois/${city}`, destination: '/illinois', permanent: true },
         { source: `/illinois/${city}/:facility*`, destination: '/illinois', permanent: true },
       ]),
       // Illinois/Idaho: facilities not in DB → state page
       { source: '/illinois/ringwood/shepherd-premier-senior-living', destination: '/illinois', permanent: true },
       // Minnesota: cities with no active facilities — redirect to state page
-      ...['st-james', 'st-charles'].flatMap(city => [
+      ...['lake-st-croix-beach', 'st-charles', 'st-james', 'st-joseph', 'st-peter'].flatMap(city => [
         { source: `/minnesota/${city}`, destination: '/minnesota', permanent: true },
         { source: `/minnesota/${city}/:facility*`, destination: '/minnesota', permanent: true },
       ]),
       // Michigan: cities with no active facilities — redirect to state page
-      ...['st-louis'].flatMap(city => [
+      ...['mt-clemens', 'st-helen', 'st-louis'].flatMap(city => [
         { source: `/michigan/${city}`, destination: '/michigan', permanent: true },
         { source: `/michigan/${city}/:facility*`, destination: '/michigan', permanent: true },
       ]),
@@ -219,6 +244,31 @@ const nextConfig: NextConfig = {
       ...['st-leonard', 'traceys-landing'].flatMap(city => [
         { source: `/maryland/${city}`, destination: '/maryland', permanent: true },
         { source: `/maryland/${city}/:facility*`, destination: '/maryland', permanent: true },
+      ]),
+      // Missouri: cities with no active facilities — redirect to state page
+      ...['lees-summit', 'ofallon'].flatMap(city => [
+        { source: `/missouri/${city}`, destination: '/missouri', permanent: true },
+        { source: `/missouri/${city}/:facility*`, destination: '/missouri', permanent: true },
+      ]),
+      // Tennessee: cities with no active facilities — redirect to state page
+      ...['mt-juliet'].flatMap(city => [
+        { source: `/tennessee/${city}`, destination: '/tennessee', permanent: true },
+        { source: `/tennessee/${city}/:facility*`, destination: '/tennessee', permanent: true },
+      ]),
+      // Massachusetts: cities with no active facilities — redirect to state page
+      ...['marthas-vineyard'].flatMap(city => [
+        { source: `/massachusetts/${city}`, destination: '/massachusetts', permanent: true },
+        { source: `/massachusetts/${city}/:facility*`, destination: '/massachusetts', permanent: true },
+      ]),
+      // Pennsylvania: cities with no active facilities — redirect to state page
+      ...['big-run', 'mt-lebanon', 'myerstown', 'st-benedict', 'st-marys', 'st-michael'].flatMap(city => [
+        { source: `/pennsylvania/${city}`, destination: '/pennsylvania', permanent: true },
+        { source: `/pennsylvania/${city}/:facility*`, destination: '/pennsylvania', permanent: true },
+      ]),
+      // North Carolina: cities with no active facilities — redirect to state page
+      ...['st-pauls'].flatMap(city => [
+        { source: `/north-carolina/${city}`, destination: '/north-carolina', permanent: true },
+        { source: `/north-carolina/${city}/:facility*`, destination: '/north-carolina', permanent: true },
       ]),
       // Specific facility redirects FIRST (before city wildcards catch them)
       ...cityRedirects
