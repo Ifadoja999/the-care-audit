@@ -5,7 +5,7 @@ import { emailQueue } from "./lib/queues";
 import { logAutomation } from "./lib/log";
 import Stripe from "stripe";
 
-// Lazy-initialized — cannot create at module level because env vars
+// Lazy-initialized: cannot create at module level because env vars
 // aren't available during Trigger.dev's indexing phase
 let _stripe: Stripe | null = null;
 function getStripe(): Stripe {
@@ -80,7 +80,7 @@ export const checkViolationTierChanges = task({
             from: FROM_EMAIL,
             to: email,
             subject:
-              "Great news — your facility now qualifies for a Featured listing",
+              "Great news: your facility now qualifies for a Featured listing",
             html: buildUpgradeEmail(facility),
           });
         }

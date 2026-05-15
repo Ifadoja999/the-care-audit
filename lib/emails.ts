@@ -65,7 +65,7 @@ ${ctaButton('Complete Your Profile', onboardUrl)}
   return resend.emails.send({
     from: FROM_EMAIL,
     to: params.email,
-    subject: 'Welcome to The Care Audit — Set Up Your Featured Listing',
+    subject: 'Welcome to The Care Audit: Set Up Your Featured Listing',
     html: emailLayout(content),
   });
 }
@@ -92,7 +92,7 @@ ${ctaButton('Complete Your Profile', onboardUrl)}
   return resend.emails.send({
     from: FROM_EMAIL,
     to: params.email,
-    subject: 'Welcome to The Care Audit — Complete Your Verified Profile',
+    subject: 'Welcome to The Care Audit: Complete Your Verified Profile',
     html: emailLayout(content),
   });
 }
@@ -114,7 +114,7 @@ ${ctaButton('Write Your Response', responseUrl)}
   return resend.emails.send({
     from: FROM_EMAIL,
     to: params.email,
-    subject: 'Welcome to The Care Audit — Post Your Facility Response',
+    subject: 'Welcome to The Care Audit: Post Your Facility Response',
     html: emailLayout(content),
   });
 }
@@ -179,7 +179,7 @@ export async function sendUpgradeEmail(params: {
   const content = `
 <h2 style="margin:0 0 16px;color:#111827;font-size:22px">Great news for your facility</h2>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your facility, <strong>${params.facilityName}</strong> in ${params.city}, ${params.state}, recently received an updated state inspection report showing <strong>${params.newCount} violation${params.newCount === 1 ? '' : 's'}</strong>.</p>
-<p style="color:#374151;line-height:1.6;margin:0 0 16px">Congratulations &mdash; this means your facility now qualifies for our premium listing options.</p>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">Congratulations. Your facility now qualifies for our premium listing options.</p>
 <h3 style="margin:24px 0 12px;color:#111827;font-size:16px">Featured Verified ($199/month)</h3>
 <ul style="color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px">
 <li>Featured Verified badge</li>
@@ -192,14 +192,14 @@ export async function sendUpgradeEmail(params: {
 <li>&ldquo;Claimed&rdquo; badge</li>
 <li>Updated contact info and description</li>
 </ul>
-<p style="color:#374151;line-height:1.6;margin:0 0 16px">Thousands of families use The Care Audit every month to research assisted living facilities in your area. A clean inspection record is something to be proud of &mdash; make sure families see it.</p>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">Thousands of families use The Care Audit every month to research assisted living facilities in your area. A clean inspection record is something to be proud of. Make sure families see it.</p>
 ${ctaButton('View Your Options', `${SITE_URL}/for-facilities`)}
 <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">You&rsquo;re currently subscribed to our Facility Response plan. Your current subscription will remain unchanged unless you choose to upgrade.</p>`;
 
   return resend.emails.send({
     from: FROM_EMAIL,
     to: params.email,
-    subject: 'Great news — your facility now qualifies for a Featured listing',
+    subject: 'Great news: your facility now qualifies for a Featured listing',
     html: emailLayout(content),
   });
 }
@@ -228,7 +228,7 @@ ${ctaButton('Start Your Free 7-Day Trial', facilityUrl)}
   return resend.emails.send({
     from: FROM_EMAIL,
     to: params.email,
-    subject: `Your free trial is ready — ${params.facilityName}`,
+    subject: `Your free trial is ready: ${params.facilityName}`,
     html: emailLayout(content),
   });
 }
@@ -247,7 +247,7 @@ export async function sendOutreachEmail(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px"><strong>${params.facilityName}</strong> in ${params.city}, ${params.state} is listed on The Care Audit, a public directory of assisted living facility inspection reports.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Thousands of families visit The Care Audit every month to research assisted living options. Your facility&rsquo;s profile currently shows <strong>${params.totalViolations} violation${params.totalViolations === 1 ? '' : 's'}</strong> from the most recent state inspection.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit organizes publicly available government inspection data into a searchable, readable format. All data comes directly from official state inspection reports.</p>
-<p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit offers facility owners the ability to enhance their listing, update their contact information, and stand out to families actively searching for care options. <strong>All plans include a free 7-day trial</strong> &mdash; no charge until after the trial ends.</p>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">The Care Audit offers facility owners the ability to enhance their listing, update their contact information, and stand out to families actively searching for care options. <strong>All plans include a free 7-day trial.</strong> No charge until after the trial ends.</p>
 ${ctaButton('Start Your Free 7-Day Trial', `${SITE_URL}/for-facilities`)}
 <p style="color:#9ca3af;font-size:11px;line-height:1.5;margin:24px 0 0;text-align:center">
 <a href="${optOutUrl}" style="color:#9ca3af;text-decoration:underline">Unsubscribe from these emails</a>
