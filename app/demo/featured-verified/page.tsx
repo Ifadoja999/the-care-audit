@@ -72,14 +72,14 @@ export default function DemoFeaturedVerifiedPage() {
         <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <img
-              src="/demo/pines-photo-1.jpg"
+              src="/demo/pines-photo-1.png"
               alt="The Pines at Buckhead common area"
               className="h-full w-full object-cover"
             />
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
             <img
-              src="/demo/pines-photo-2.jpg"
+              src="/demo/pines-photo-2.png"
               alt="The Pines at Buckhead outdoor garden"
               className="h-full w-full object-cover"
             />
