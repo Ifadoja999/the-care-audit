@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripe, getTierPrices } from '@/lib/stripe';
+import { getStripe, getTierPrices, getTierPricesAnnual } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase';
 
 const VALID_TIERS = ['featured_verified', 'verified_profile', 'facility_response'] as const;
+const VALID_BILLING_PERIODS = ['monthly', 'annual'] as const;
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { facility_id, tier } = body;
+    const { facility_id, tier, billing_period = 'monthly' } = body;
 
     if (!facility_id || !tier || !VALID_TIERS.includes(tier)) {
       return NextResponse.json({ error: 'Invalid facility_id or tier' }, { status: 400 });
+    }
+    if (!VALID_BILLING_PERIODS.includes(billing_period)) {
+      return NextResponse.json({ error: 'Invalid billing_period' }, { status: 400 });
     }
 
     const supabase = createServerClient();
@@ -48,7 +52,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const priceId = getTierPrices()[tier];
+    const prices = billing_period === 'annual' ? getTierPricesAnnual() : getTierPrices();
+    const priceId = prices[tier];
     if (!priceId) {
       return NextResponse.json({ error: 'Price not configured for this tier' }, { status: 500 });
     }

@@ -46,6 +46,7 @@ export default function ForFacilitiesPage() {
   const [successBanner, setSuccessBanner] = useState(false);
   const [cancelBanner, setCancelBanner] = useState(false);
   const [isDeepLink, setIsDeepLink] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   // On mount: read URL params for success/cancel banners and facility deep-link
   useEffect(() => {
@@ -97,7 +98,7 @@ export default function ForFacilitiesPage() {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ facility_id: selected.id, tier }),
+        body: JSON.stringify({ facility_id: selected.id, tier, billing_period: billingPeriod }),
       });
       const data = await res.json();
       if (data.url) {
@@ -313,6 +314,23 @@ export default function ForFacilitiesPage() {
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Start free — no charge for 7 days
                 </div>
+
+                {/* Billing period toggle */}
+                <div className="mt-5 inline-flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+                  <button
+                    onClick={() => setBillingPeriod('monthly')}
+                    className={`rounded-lg px-5 py-2 text-sm font-medium transition-colors ${billingPeriod === 'monthly' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setBillingPeriod('annual')}
+                    className={`rounded-lg px-5 py-2 text-sm font-medium transition-colors ${billingPeriod === 'annual' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Annual
+                    <span className="ml-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">2 months free</span>
+                  </button>
+                </div>
               </div>
 
               {showPremiumTiers ? (
@@ -323,7 +341,14 @@ export default function ForFacilitiesPage() {
                       <Shield className="h-6 w-6 text-amber-500" />
                       <h3 className="text-xl font-bold text-gray-900">Featured Verified</h3>
                     </div>
-                    <p className="text-3xl font-bold text-gray-900">$149<span className="text-base font-normal text-gray-500">/month</span></p>
+                    {billingPeriod === 'monthly' ? (
+                      <p className="text-3xl font-bold text-gray-900">$199<span className="text-base font-normal text-gray-500">/month</span></p>
+                    ) : (
+                      <div>
+                        <p className="text-3xl font-bold text-gray-900">$1,990<span className="text-base font-normal text-gray-500">/year</span></p>
+                        <p className="mt-0.5 text-sm text-green-700 font-medium">Save $398 (2 months free)</p>
+                      </div>
+                    )}
                     <ul className="mt-4 space-y-2 text-sm text-gray-700">
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />Featured Verified badge on your profile</li>
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />Priority placement on city and state pages</li>
@@ -347,7 +372,14 @@ export default function ForFacilitiesPage() {
                       <CheckCircle2 className="h-6 w-6 text-slate-500" />
                       <h3 className="text-xl font-bold text-gray-900">Verified Profile</h3>
                     </div>
-                    <p className="text-3xl font-bold text-gray-900">$79<span className="text-base font-normal text-gray-500">/month</span></p>
+                    {billingPeriod === 'monthly' ? (
+                      <p className="text-3xl font-bold text-gray-900">$129<span className="text-base font-normal text-gray-500">/month</span></p>
+                    ) : (
+                      <div>
+                        <p className="text-3xl font-bold text-gray-900">$1,290<span className="text-base font-normal text-gray-500">/year</span></p>
+                        <p className="mt-0.5 text-sm text-green-700 font-medium">Save $258 (2 months free)</p>
+                      </div>
+                    )}
                     <ul className="mt-4 space-y-2 text-sm text-gray-700">
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />&ldquo;Claimed&rdquo; badge on your profile</li>
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />Updated contact info (phone, address, website, email)</li>
@@ -370,7 +402,14 @@ export default function ForFacilitiesPage() {
                       <MessageSquare className="h-6 w-6 text-gray-500" />
                       <h3 className="text-xl font-bold text-gray-900">Facility Response</h3>
                     </div>
-                    <p className="text-3xl font-bold text-gray-900">$49<span className="text-base font-normal text-gray-500">/month</span></p>
+                    {billingPeriod === 'monthly' ? (
+                      <p className="text-3xl font-bold text-gray-900">$79<span className="text-base font-normal text-gray-500">/month</span></p>
+                    ) : (
+                      <div>
+                        <p className="text-3xl font-bold text-gray-900">$790<span className="text-base font-normal text-gray-500">/year</span></p>
+                        <p className="mt-0.5 text-sm text-green-700 font-medium">Save $158 (2 months free)</p>
+                      </div>
+                    )}
                     <ul className="mt-4 space-y-2 text-sm text-gray-700">
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" />Post an official response on your profile page</li>
                       <li className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" />Update your phone number and address</li>

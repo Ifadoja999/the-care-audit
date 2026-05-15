@@ -128,7 +128,7 @@ function buildDowngradeEmail(facility: any): string {
       <p>Following the most recent state inspection data update, <strong>${facility.facility_name}</strong>
       now shows <strong>${facility.total_violations} violations</strong>.</p>
       <p>Because Featured Verified and Verified Profile listings are available only to facilities with
-      3 or fewer violations, your listing will transition to <strong>Facility Response ($49/month)</strong>
+      3 or fewer violations, your listing will transition to <strong>Facility Response ($79/month)</strong>
       on your next billing cycle.</p>
       <p><strong>What Facility Response includes:</strong></p>
       <ul>
@@ -158,8 +158,8 @@ function buildUpgradeEmail(facility: any): string {
       now shows <strong>${facility.total_violations} violation${facility.total_violations !== 1 ? "s" : ""}</strong>.</p>
       <p>This means you now qualify for our premium listing options:</p>
       <ul>
-        <li><strong>Featured Verified ($149/mo)</strong> — Gold badge, featured placement, photos, "Schedule a Tour" button</li>
-        <li><strong>Verified Profile ($79/mo)</strong> — Verified badge, updated contact info, facility description</li>
+        <li><strong>Featured Verified ($199/mo)</strong> - Gold badge, featured placement, photos, "Schedule a Tour" button</li>
+        <li><strong>Verified Profile ($129/mo)</strong> - Verified badge, updated contact info, facility description</li>
       </ul>
       <p>Your current Facility Response subscription will continue unless you choose to upgrade.</p>
       <div style="text-align: center; margin: 32px 0;">

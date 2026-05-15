@@ -19,6 +19,14 @@ export function getTierPrices(): Record<string, string> {
   };
 }
 
+export function getTierPricesAnnual(): Record<string, string> {
+  return {
+    featured_verified: (process.env.STRIPE_PRICE_FEATURED_ANNUAL || '').trim(),
+    verified_profile: (process.env.STRIPE_PRICE_VERIFIED_ANNUAL || '').trim(),
+    facility_response: (process.env.STRIPE_PRICE_RESPONSE_ANNUAL || '').trim(),
+  };
+}
+
 export const TIER_NAMES: Record<string, string> = {
   featured_verified: 'Featured Verified',
   verified_profile: 'Verified Profile',
@@ -26,7 +34,19 @@ export const TIER_NAMES: Record<string, string> = {
 };
 
 export const TIER_AMOUNTS: Record<string, number> = {
-  featured_verified: 149,
-  verified_profile: 79,
-  facility_response: 49,
+  featured_verified: 199,
+  verified_profile: 129,
+  facility_response: 79,
+};
+
+export const TIER_AMOUNTS_ANNUAL: Record<string, number> = {
+  featured_verified: 1990,
+  verified_profile: 1290,
+  facility_response: 790,
+};
+
+export const TIER_ANNUAL_SAVINGS: Record<string, number> = {
+  featured_verified: 398,
+  verified_profile: 258,
+  facility_response: 158,
 };

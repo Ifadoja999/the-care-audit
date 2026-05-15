@@ -156,7 +156,7 @@ export async function sendDowngradeEmail(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your facility, <strong>${params.facilityName}</strong> in ${params.city}, ${params.state}, recently received an updated state inspection report.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your violation count has changed from ${params.oldCount} to ${params.newCount}, which means your current ${params.currentTierName} listing no longer meets the eligibility requirements.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Eligibility for Featured Verified and Verified Profile listings requires 3 or fewer violations from the most recent state inspection.</p>
-<p style="color:#374151;line-height:1.6;margin:0 0 16px">Your listing will transition to our Facility Response plan ($49/month) on your next billing cycle. With Facility Response, you can post an official response on your facility&rsquo;s profile page and update your phone number and address.</p>
+<p style="color:#374151;line-height:1.6;margin:0 0 16px">Your listing will transition to our Facility Response plan ($79/month) on your next billing cycle. With Facility Response, you can post an official response on your facility&rsquo;s profile page and update your phone number and address.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">If you&rsquo;d prefer to cancel your subscription entirely, you can do so anytime through your subscription management page.</p>
 ${ctaButton('Manage Your Subscription', `${SITE_URL}/manage-subscription`)}
 <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:24px 0 0">If your violation count decreases to 3 or fewer following a future inspection, you&rsquo;ll be eligible to upgrade back to Featured Verified or Verified Profile.</p>`;
@@ -180,14 +180,14 @@ export async function sendUpgradeEmail(params: {
 <h2 style="margin:0 0 16px;color:#111827;font-size:22px">Great news for your facility</h2>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Your facility, <strong>${params.facilityName}</strong> in ${params.city}, ${params.state}, recently received an updated state inspection report showing <strong>${params.newCount} violation${params.newCount === 1 ? '' : 's'}</strong>.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Congratulations &mdash; this means your facility now qualifies for our premium listing options.</p>
-<h3 style="margin:24px 0 12px;color:#111827;font-size:16px">Featured Verified ($149/month)</h3>
+<h3 style="margin:24px 0 12px;color:#111827;font-size:16px">Featured Verified ($199/month)</h3>
 <ul style="color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px">
 <li>Featured Verified badge</li>
 <li>Priority placement on city and state pages</li>
 <li>Up to 4 photos, &ldquo;Schedule a Tour&rdquo; button</li>
 <li>Updated contact info and description</li>
 </ul>
-<h3 style="margin:24px 0 12px;color:#111827;font-size:16px">Verified Profile ($79/month)</h3>
+<h3 style="margin:24px 0 12px;color:#111827;font-size:16px">Verified Profile ($129/month)</h3>
 <ul style="color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px">
 <li>&ldquo;Claimed&rdquo; badge</li>
 <li>Updated contact info and description</li>
@@ -217,9 +217,9 @@ export async function sendTrialRecoveryEmail(params: {
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">We noticed you started setting up your listing for <strong>${params.facilityName}</strong> in ${params.city}, ${params.state} but didn&rsquo;t finish.</p>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">We&rsquo;ve made it easier to get started: <strong>all plans now include a free 7-day trial.</strong> No charge until after the trial ends.</p>
 <ul style="color:#374151;line-height:1.8;margin:0 0 16px;padding-left:20px">
-<li>Featured Verified &mdash; $149/month (priority placement, photos, Tour button)</li>
-<li>Verified Profile &mdash; $79/month (Claimed badge, updated contact info)</li>
-<li>Facility Response &mdash; $49/month (post your official response)</li>
+<li>Featured Verified: $199/month (priority placement, photos, Tour button)</li>
+<li>Verified Profile: $129/month (Claimed badge, updated contact info)</li>
+<li>Facility Response: $79/month (post your official response)</li>
 </ul>
 <p style="color:#374151;line-height:1.6;margin:0 0 16px">Try it free and see the value before you commit.</p>
 ${ctaButton('Start Your Free 7-Day Trial', facilityUrl)}

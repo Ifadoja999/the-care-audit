@@ -52,6 +52,7 @@ export default function FacilityResponseDemoPage() {
         {/* Demo label */}
         <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm text-center">
           <p className="text-sm text-gray-500">Demo: <strong>Facility Response</strong></p>
+          <p className="mt-1 text-sm font-semibold text-gray-800">$79/month</p>
         </div>
 
         {/* Violation Summary */}
