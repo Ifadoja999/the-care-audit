@@ -86,17 +86,9 @@ export default function DemoFeaturedVerifiedPage() {
           </div>
         </div>
 
-        {/* CTA: TOP */}
-        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            This is a demo of the <strong>Featured Verified</strong> tier ($149/mo). Get a gold badge, photo gallery, tour scheduling, and top placement where families are searching.
-          </p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Start your 7-day free trial
-          </a>
+        {/* Demo label */}
+        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm text-center">
+          <p className="text-sm text-gray-500">Demo: <strong>Featured Verified</strong></p>
         </div>
 
         {/* Facility Description */}
@@ -164,19 +156,6 @@ export default function DemoFeaturedVerifiedPage() {
           <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
         </div>
 
-        {/* CTA: BOTTOM */}
-        <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            Ready to stand out with a gold badge, photos, and tour scheduling on your profile?
-          </p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Start your 7-day free trial
-          </a>
-          <p className="mt-3 text-xs text-gray-400">7-day free trial. Card required. Cancel anytime.</p>
-        </div>
 
       </main>
       <Footer />

@@ -49,15 +49,9 @@ export default function FacilityResponseDemoPage() {
           </p>
         </div>
 
-        {/* Top CTA */}
-        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">This is a demo of the <strong>Facility Response</strong> tier ($49/mo). Add your official response and it appears here, directly below the inspection data, where families are reading.</p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Add your response. 7-day free trial.
-          </a>
+        {/* Demo label */}
+        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm text-center">
+          <p className="text-sm text-gray-500">Demo: <strong>Facility Response</strong></p>
         </div>
 
         {/* Violation Summary */}
@@ -113,17 +107,6 @@ export default function FacilityResponseDemoPage() {
           <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">Your response appears here, directly below the inspection data, where families are making decisions about care.</p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Add your response. 7-day free trial.
-          </a>
-          <p className="mt-3 text-xs text-gray-400">7-day free trial. Card required. Cancel anytime.</p>
-        </div>
 
       </main>
       <Footer />

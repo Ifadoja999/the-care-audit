@@ -80,18 +80,9 @@ export default function DemoVerifiedProfilePage() {
           </p>
         </div>
 
-        {/* CTA button — TOP */}
-        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            This is a demo of the <strong>Verified Profile</strong> tier ($79/mo). Claim your
-            facility profile and show families your story.
-          </p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Start your 7-day free trial
-          </a>
+        {/* Demo label */}
+        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-4 shadow-sm text-center">
+          <p className="text-sm text-gray-500">Demo: <strong>Verified Profile</strong></p>
         </div>
 
         {/* Facility Description block */}
@@ -165,21 +156,6 @@ export default function DemoVerifiedProfilePage() {
           <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
         </div>
 
-        {/* CTA button — BOTTOM */}
-        <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">
-            Ready to claim your profile and reach families researching care options?
-          </p>
-          <a
-            href="/for-facilities"
-            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
-          >
-            Start your 7-day free trial
-          </a>
-          <p className="mt-3 text-xs text-gray-400">
-            7-day free trial. Card required. Cancel anytime.
-          </p>
-        </div>
       </main>
       <Footer />
     </div>
