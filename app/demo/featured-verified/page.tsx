@@ -1,11 +1,11 @@
-import { CheckCircle2, Globe, Mail, Phone, MapPin, Calendar, ExternalLink } from 'lucide-react';
+import { Globe, Mail, Phone, MapPin, Calendar, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
 import Breadcrumb from '@/components/Breadcrumb';
 import Footer from '@/components/Footer';
 
 export const metadata = {
   title: 'Demo: Featured Verified | The Care Audit',
-  description: 'See what a Featured Verified profile looks like on The Care Audit — gold badge, photos, facility description, and more.',
+  description: 'See what a Featured Verified profile looks like on The Care Audit: gold badge, photos, facility description, and more.',
   robots: { index: false, follow: false },
 };
 
@@ -24,7 +24,7 @@ export default function DemoFeaturedVerifiedPage() {
           ]}
         />
 
-        {/* Facility Header — Featured Verified uses gold border/bg */}
+        {/* Facility Header: Featured Verified uses gold border/bg */}
         <div className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50/30 p-6">
           <div className="flex flex-wrap items-start gap-3">
             <h1 className="text-3xl font-bold text-gray-900">
@@ -68,7 +68,7 @@ export default function DemoFeaturedVerifiedPage() {
           </p>
         </div>
 
-        {/* Photo Gallery — Featured Verified only. Use styled placeholder divs. */}
+        {/* Photo Gallery: Featured Verified only. Placeholder divs. */}
         <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
           {[1, 2].map((i) => (
             <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
@@ -83,7 +83,7 @@ export default function DemoFeaturedVerifiedPage() {
           ))}
         </div>
 
-        {/* CTA — TOP */}
+        {/* CTA: TOP */}
         <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
           <p className="text-sm text-gray-500 mb-4">
             This is a demo of the <strong>Featured Verified</strong> tier ($149/mo). Get a gold badge, photo gallery, tour scheduling, and top placement where families are searching.
@@ -107,7 +107,7 @@ export default function DemoFeaturedVerifiedPage() {
           </p>
         </div>
 
-        {/* Schedule a Tour — Featured Verified only */}
+        {/* Schedule a Tour: Featured Verified only */}
         <div className="mt-6">
           <a
             href="https://pinesatbuckhead.example.com/tour"
@@ -161,7 +161,7 @@ export default function DemoFeaturedVerifiedPage() {
           <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
         </div>
 
-        {/* CTA — BOTTOM */}
+        {/* CTA: BOTTOM */}
         <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
           <p className="text-sm text-gray-500 mb-4">
             Ready to stand out with a gold badge, photos, and tour scheduling on your profile?
