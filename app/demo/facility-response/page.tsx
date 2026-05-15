@@ -27,7 +27,7 @@ export default function FacilityResponseDemoPage() {
         {/* Facility Header */}
         <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-start gap-3">
-            <h1 className="text-3xl font-bold text-gray-900" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h1 className="text-3xl font-bold text-gray-900">
               Sunrise Care Center
             </h1>
           </div>
@@ -51,12 +51,12 @@ export default function FacilityResponseDemoPage() {
 
         {/* Top CTA */}
         <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">This is a demo of the <strong>Facility Response</strong> tier ($49/mo). Add your official response — it appears here, directly below the inspection data, where families are reading.</p>
+          <p className="text-sm text-gray-500 mb-4">This is a demo of the <strong>Facility Response</strong> tier ($49/mo). Add your official response and it appears here, directly below the inspection data, where families are reading.</p>
           <a
             href="/for-facilities"
             className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
           >
-            Add your response — 7-day free trial
+            Add your response. 7-day free trial.
           </a>
         </div>
 
@@ -101,14 +101,26 @@ export default function FacilityResponseDemoPage() {
           </p>
         </div>
 
+        {/* Official Report placeholder */}
+        <div className="mt-8">
+          <a
+            href="/for-facilities"
+            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-navy-light hover:shadow-md"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            View Official State Inspection Report
+          </a>
+          <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
+        </div>
+
         {/* Bottom CTA */}
         <div className="mt-8 rounded-2xl border border-warm-200 bg-white p-6 shadow-sm text-center">
-          <p className="text-sm text-gray-500 mb-4">Your response appears here — directly below the inspection data, where families are making decisions about care.</p>
+          <p className="text-sm text-gray-500 mb-4">Your response appears here, directly below the inspection data, where families are making decisions about care.</p>
           <a
             href="/for-facilities"
             className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all hover:bg-navy-light hover:shadow-md"
           >
-            Add your response — 7-day free trial
+            Add your response. 7-day free trial.
           </a>
           <p className="mt-3 text-xs text-gray-400">7-day free trial. Card required. Cancel anytime.</p>
         </div>

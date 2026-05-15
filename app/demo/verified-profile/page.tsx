@@ -29,7 +29,6 @@ export default function DemoVerifiedProfilePage() {
           <div className="flex flex-wrap items-start gap-3">
             <h1
               className="text-3xl font-bold text-gray-900"
-              style={{ fontFamily: 'var(--font-heading)' }}
             >
               Maplewood Gardens Assisted Living
             </h1>
@@ -152,6 +151,18 @@ export default function DemoVerifiedProfilePage() {
             inspection reports. It may contain errors or omissions. It is not a professional
             assessment and should not be the sole basis for any decision.
           </p>
+        </div>
+
+        {/* Official Report placeholder */}
+        <div className="mt-8">
+          <a
+            href="/for-facilities"
+            className="inline-flex items-center gap-2 rounded-xl bg-navy px-6 py-3.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-navy-light hover:shadow-md"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            View Official State Inspection Report
+          </a>
+          <p className="mt-2 text-xs text-gray-400">Opens original document on the state government website</p>
         </div>
 
         {/* CTA button — BOTTOM */}
