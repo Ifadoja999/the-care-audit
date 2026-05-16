@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@/lib/supabase';
 
 export async function GET(
@@ -33,7 +34,7 @@ export async function POST(
 
   const { data: facility, error: lookupError } = await supabase
     .from('facilities')
-    .select('id')
+    .select('id, slug')
     .eq('onboarding_token', token)
     .eq('is_sponsored', true)
     .eq('sponsor_tier', 'facility_response')
@@ -62,6 +63,16 @@ export async function POST(
   if (updateError) {
     console.error('Facility response update error:', updateError);
     return NextResponse.json({ error: 'Failed to save changes.' }, { status: 500 });
+  }
+
+  // Revalidate ISR-cached pages so the published response appears immediately
+  if (facility.slug) {
+    revalidatePath(`/${facility.slug}`);
+    const slugParts = facility.slug.split('/');
+    if (slugParts.length >= 2) {
+      revalidatePath(`/${slugParts[0]}/${slugParts[1]}`); // city page
+      revalidatePath(`/${slugParts[0]}`); // state page
+    }
   }
 
   return NextResponse.json({ success: true });

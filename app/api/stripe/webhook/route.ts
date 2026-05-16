@@ -162,9 +162,9 @@ export async function POST(req: NextRequest) {
       const priceId = subscription.items.data[0]?.price?.id;
       let newTier: string | null = null;
 
-      if (priceId === (process.env.STRIPE_PRICE_FEATURED || '').trim()) newTier = 'featured_verified';
-      else if (priceId === (process.env.STRIPE_PRICE_VERIFIED || '').trim()) newTier = 'verified_profile';
-      else if (priceId === (process.env.STRIPE_PRICE_RESPONSE || '').trim()) newTier = 'facility_response';
+      if (priceId === (process.env.STRIPE_PRICE_FEATURED || '').trim() || priceId === (process.env.STRIPE_PRICE_FEATURED_ANNUAL || '').trim()) newTier = 'featured_verified';
+      else if (priceId === (process.env.STRIPE_PRICE_VERIFIED || '').trim() || priceId === (process.env.STRIPE_PRICE_VERIFIED_ANNUAL || '').trim()) newTier = 'verified_profile';
+      else if (priceId === (process.env.STRIPE_PRICE_RESPONSE || '').trim() || priceId === (process.env.STRIPE_PRICE_RESPONSE_ANNUAL || '').trim()) newTier = 'facility_response';
 
       if (newTier) {
         const { data: updatedFacility } = await supabase
