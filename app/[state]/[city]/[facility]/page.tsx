@@ -43,14 +43,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { state: stateSlug, city: citySlug, facility: facilitySlug } = await params;
   const slug = `${stateSlug}/${citySlug}/${facilitySlug}`;
   const data = await getFacilityBySlug(slug);
+  // If no facility or no meaningful content, page component will call notFound().
+  // Return empty metadata here so Next.js renders the 404 page cleanly.
   if (!data) return {};
-  if (data.total_violations === null && !data.ai_summary) {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.com';
-    return {
-      robots: { index: false, follow: false },
-      alternates: { canonical: `${siteUrl}/${slug}` },
-    };
-  }
+  if (data.total_violations === null && !data.ai_summary) return {};
   return generateFacilityMetadata(data);
 }
 
@@ -88,6 +84,11 @@ export default async function FacilityPage({ params }: Props) {
 
   const facility = await getFacilityBySlug(slug);
   if (!facility) notFound();
+
+  // Facilities with no violation data and no AI summary have no meaningful content.
+  // Return a real 404 (not 200+noindex) so Google does not flag them as Soft 404.
+  // These are "directory-only" facilities that haven't been enriched yet.
+  if (facility.total_violations === null && !facility.ai_summary) notFound();
 
   const stateCode = slugToStateCode(stateSlug);
   const stateName = stateCode ? stateCodeToName(stateCode) : stateSlug;
