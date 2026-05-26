@@ -129,7 +129,9 @@ const CITY_ABBREVIATION_MAP: Record<string, Record<string, string>> = {
   // Minnesota
   minnesota: {
     'saint-anthony': 'st-anthony',
-    'lake-st-croix-beach': 'lake-saint-croix-beach',
+    // 'lake-st-croix-beach' REMOVED 2026-05-26: DB stores it as "LAKE ST CROIX BEACH"
+    // so the natural lake-st-croix-beach slug resolves correctly via getFacilitiesByCity.
+    // Redirecting to "lake-saint-croix-beach" sent visitors to a non-existent slug.
   },
 };
 

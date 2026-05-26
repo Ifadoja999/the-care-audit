@@ -144,8 +144,6 @@ const nextConfig: NextConfig = {
       // Idaho: amp-encoded facility slugs → correct slug (confirmed in DB)
       ['idaho/nampa/r-amp-v-assisted-living-inc', 'idaho/nampa/r-v-assisted-living-inc'],
       ['idaho/burley/home-amp-heart-assisted-living-llc', 'idaho/burley/home-heart-assisted-living-llc'],
-      // Tennessee: mt-juliet city has no active facilities → state page
-      ['tennessee/mt-juliet/providence-place-of-mt-juliet', 'tennessee'],
       // Alaska: facility not in DB → city page
       ['alaska/anchorage/brentwood-assisted-living', 'alaska/anchorage'],
       // Michigan: amp-encoded facility slug → correct slug (confirmed in DB)
@@ -171,10 +169,13 @@ const nextConfig: NextConfig = {
       // Florida: city redirect wildcard sends port-st-lucie → port-saint-lucie but facility slug also changed
       ['florida/port-st-lucie/wickshire-port-st-lucie', 'florida/port-saint-lucie/wickshire-port-saint-lucie'],
       ['florida/port-saint-lucie/wickshire-port-st-lucie', 'florida/port-saint-lucie/wickshire-port-saint-lucie'],
-      // Illinois: facility not in DB → city page
-      ['illinois/grayslake/theresas-home-care-iii-llc', 'illinois/grayslake'],
-      // Illinois: stcharles wildcard chains to st-charles which has no facilities — short-circuit to state
-      ['illinois/stcharles/bickford-cottage-st-charles', 'illinois'],
+      // Illinois: facility moved cities in DB — redirect to its actual current location
+      ['illinois/grayslake/theresas-home-care-iii-llc', 'illinois/libertyville/theresas-home-care-iii-llc'],
+      // Illinois: facility moved cities in DB — redirect to its actual current location
+      ['illinois/ringwood/shepherd-premier-senior-living', 'illinois/sterling/shepherd-premier-senior-living'],
+      // Illinois: bickford-cottage's DB slug city is the malformed "stcharles" (no hyphen).
+      // GSC indexed it at that bad slug. Send to the canonical st-charles city page where its siblings live.
+      ['illinois/stcharles/bickford-cottage-st-charles', 'illinois/st-charles'],
     ];
 
     // 2-letter state abbreviation → full state slug redirects
@@ -224,52 +225,25 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Illinois: cities where all facilities are closed — redirect to state page
-      ...['bensenville', 'bradford', 'buffalo', 'chillicothe', 'crete', 'elizabeth', 'flora', 'green-valley', 'havana', 'hazel-crest', 'hinsdale', 'mc-henry', 'moweaqua', 'mt-vernon', 'paris', 'salem', 'st-charles', 'zion'].flatMap(city => [
+      // (st-charles REMOVED 2026-05-26: confirmed 8 active facilities in DB)
+      // (carlyle ADDED 2026-05-26: GSC 404 — verified 0 active facilities)
+      ...['bensenville', 'bradford', 'buffalo', 'carlyle', 'chillicothe', 'crete', 'elizabeth', 'flora', 'green-valley', 'havana', 'hazel-crest', 'hinsdale', 'mc-henry', 'moweaqua', 'mt-vernon', 'paris', 'salem', 'zion'].flatMap(city => [
         { source: `/illinois/${city}`, destination: '/illinois', permanent: true },
         { source: `/illinois/${city}/:facility*`, destination: '/illinois', permanent: true },
       ]),
-      // Illinois/Idaho: facilities not in DB → state page
-      { source: '/illinois/ringwood/shepherd-premier-senior-living', destination: '/illinois', permanent: true },
-      // Minnesota: cities with no active facilities — redirect to state page
-      ...['lake-st-croix-beach', 'st-charles', 'st-james', 'st-joseph', 'st-peter'].flatMap(city => [
-        { source: `/minnesota/${city}`, destination: '/minnesota', permanent: true },
-        { source: `/minnesota/${city}/:facility*`, destination: '/minnesota', permanent: true },
-      ]),
-      // Michigan: cities with no active facilities — redirect to state page
-      ...['mt-clemens', 'st-helen', 'st-louis'].flatMap(city => [
-        { source: `/michigan/${city}`, destination: '/michigan', permanent: true },
-        { source: `/michigan/${city}/:facility*`, destination: '/michigan', permanent: true },
-      ]),
-      // Maryland: cities with no active facilities — redirect to state page
-      ...['st-leonard', 'traceys-landing'].flatMap(city => [
-        { source: `/maryland/${city}`, destination: '/maryland', permanent: true },
-        { source: `/maryland/${city}/:facility*`, destination: '/maryland', permanent: true },
-      ]),
-      // Missouri: cities with no active facilities — redirect to state page
-      ...['lees-summit', 'ofallon'].flatMap(city => [
-        { source: `/missouri/${city}`, destination: '/missouri', permanent: true },
-        { source: `/missouri/${city}/:facility*`, destination: '/missouri', permanent: true },
-      ]),
-      // Tennessee: cities with no active facilities — redirect to state page
-      ...['mt-juliet'].flatMap(city => [
-        { source: `/tennessee/${city}`, destination: '/tennessee', permanent: true },
-        { source: `/tennessee/${city}/:facility*`, destination: '/tennessee', permanent: true },
-      ]),
-      // Massachusetts: cities with no active facilities — redirect to state page
-      ...['marthas-vineyard'].flatMap(city => [
-        { source: `/massachusetts/${city}`, destination: '/massachusetts', permanent: true },
-        { source: `/massachusetts/${city}/:facility*`, destination: '/massachusetts', permanent: true },
-      ]),
-      // Pennsylvania: cities with no active facilities — redirect to state page
-      ...['big-run', 'mt-lebanon', 'myerstown', 'st-benedict', 'st-marys', 'st-michael'].flatMap(city => [
-        { source: `/pennsylvania/${city}`, destination: '/pennsylvania', permanent: true },
-        { source: `/pennsylvania/${city}/:facility*`, destination: '/pennsylvania', permanent: true },
-      ]),
-      // North Carolina: cities with no active facilities — redirect to state page
-      ...['st-pauls'].flatMap(city => [
-        { source: `/north-carolina/${city}`, destination: '/north-carolina', permanent: true },
-        { source: `/north-carolina/${city}/:facility*`, destination: '/north-carolina', permanent: true },
-      ]),
+      // NOTE 2026-05-26: the following per-state city-to-state redirects were REMOVED
+      // because every listed city actually has active facilities in Supabase. They
+      // were sending GSC-indexed URLs to /<state> instead of the real city page,
+      // which Google reads as a Not Found (404) signal. Cities verified to have
+      // active facilities and now allowed to render normally:
+      //   MN: lake-st-croix-beach (1), st-charles (1), st-james (1), st-joseph (4), st-peter (4)
+      //   MI: mt-clemens (2), st-helen (1), st-louis (2)
+      //   MD: st-leonard (1), traceys-landing (1)
+      //   MO: lees-summit (6), ofallon/o-fallon (5)
+      //   TN: mt-juliet (5)
+      //   MA: marthas-vineyard (1)
+      //   PA: big-run (1), mt-lebanon (1), myerstown (1), st-benedict (1), st-marys (1), st-michael (1)
+      //   NC: st-pauls (1)
       // Specific facility redirects FIRST (before city wildcards catch them)
       ...cityRedirects
         .filter(([oldPath]) => oldPath.split('/').length === 3)

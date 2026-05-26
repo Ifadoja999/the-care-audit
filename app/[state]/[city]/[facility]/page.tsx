@@ -39,6 +39,30 @@ export async function generateStaticParams() {
   return [];
 }
 
+// Placeholder ai_summary prefixes that indicate the facility has no real
+// inspection data yet. These boilerplate strings are reused verbatim across
+// many facilities in the same state and trigger Google "Soft 404" flags
+// when paired with total_violations IS NULL. Keep in sync with the check
+// in the page component below.
+const PLACEHOLDER_AI_SUMMARY_PREFIXES = [
+  'inspection data is being processed',
+  'no inspection data is currently available',
+  'inspection data is not yet available',
+];
+
+function isPlaceholderAiSummary(ai: string | null | undefined): boolean {
+  if (!ai) return true;
+  const head = ai.trimStart().toLowerCase();
+  return PLACEHOLDER_AI_SUMMARY_PREFIXES.some((p) => head.startsWith(p));
+}
+
+function hasThinContent(facility: { total_violations: number | null; ai_summary: string | null | undefined }): boolean {
+  // A page is "thin" (and should 404 to avoid Google Soft 404 flags) when
+  // we have no numeric violation data AND no real AI summary — only the
+  // generic boilerplate placeholder, or nothing at all.
+  return facility.total_violations === null && isPlaceholderAiSummary(facility.ai_summary);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { state: stateSlug, city: citySlug, facility: facilitySlug } = await params;
   const slug = `${stateSlug}/${citySlug}/${facilitySlug}`;
@@ -46,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // If no facility or no meaningful content, page component will call notFound().
   // Return empty metadata here so Next.js renders the 404 page cleanly.
   if (!data) return {};
-  if (data.total_violations === null && !data.ai_summary) return {};
+  if (hasThinContent(data)) return {};
   return generateFacilityMetadata(data);
 }
 
@@ -85,10 +109,14 @@ export default async function FacilityPage({ params }: Props) {
   const facility = await getFacilityBySlug(slug);
   if (!facility) notFound();
 
-  // Facilities with no violation data and no AI summary have no meaningful content.
-  // Return a real 404 (not 200+noindex) so Google does not flag them as Soft 404.
-  // These are "directory-only" facilities that haven't been enriched yet.
-  if (facility.total_violations === null && !facility.ai_summary) notFound();
+  // Facilities with no violation data and only a generic placeholder ai_summary
+  // (or no ai_summary at all) have no unique content. Return a real 404 so
+  // Google does not flag them as Soft 404. This catches both:
+  //  1. Directory-only rows (no enrichment yet) — total_violations IS NULL, ai_summary IS NULL
+  //  2. Boilerplate rows where ai_summary starts with a templated phrase like
+  //     "Inspection data is being processed" / "No inspection data is currently available"
+  //     / "Inspection data is not yet available" (repeated verbatim across the state).
+  if (hasThinContent(facility)) notFound();
 
   const stateCode = slugToStateCode(stateSlug);
   const stateName = stateCode ? stateCodeToName(stateCode) : stateSlug;
