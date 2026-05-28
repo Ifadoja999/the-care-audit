@@ -105,36 +105,36 @@ export default function PartnersPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-gray-500 border-b border-warm-200">
-                    <th className="pb-2 font-normal">Active clients</th>
-                    <th className="pb-2 font-normal">Rate</th>
-                    <th className="pb-2 font-normal">Monthly</th>
-                    <th className="pb-2 font-normal">Annual</th>
+                    <th className="pb-2 font-normal">Tier</th>
+                    <th className="pb-2 font-normal">Price/mo</th>
+                    <th className="pb-2 font-normal">Per referral/mo</th>
+                    <th className="pb-2 font-normal">5 referrals/yr (at 30%)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-warm-100 text-gray-700">
                   <tr>
-                    <td className="py-2">3 clients at $129/mo</td>
-                    <td className="py-2">30%</td>
-                    <td className="py-2">$116</td>
-                    <td className="py-2 font-semibold">$1,393</td>
+                    <td className="py-2 font-medium text-navy">FR (Facility Response)</td>
+                    <td className="py-2">$79</td>
+                    <td className="py-2">$23.70</td>
+                    <td className="py-2 font-semibold">$1,422</td>
                   </tr>
                   <tr>
-                    <td className="py-2">7 clients at $129/mo</td>
-                    <td className="py-2">30%</td>
-                    <td className="py-2">$271</td>
-                    <td className="py-2 font-semibold">$3,251</td>
+                    <td className="py-2 font-medium text-navy">VP (Verified Profile)</td>
+                    <td className="py-2">$129</td>
+                    <td className="py-2">$38.70</td>
+                    <td className="py-2 font-semibold">$2,322</td>
                   </tr>
                   <tr>
-                    <td className="py-2">10 clients at $129/mo</td>
-                    <td className="py-2">30%</td>
-                    <td className="py-2">$387</td>
-                    <td className="py-2 font-semibold text-accent">$4,644</td>
+                    <td className="py-2 font-medium text-navy">FV (Full Visibility)</td>
+                    <td className="py-2">$199</td>
+                    <td className="py-2">$59.70</td>
+                    <td className="py-2 font-semibold text-accent">$3,582</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className="mt-3 text-xs text-gray-400">
-              Founding Partner 30% rate. Commissions are lifetime and recurring.
+              Based on Founding Partner 30% rate, 5 active referrals. Commissions are lifetime and recurring.
             </p>
           </section>
 
@@ -142,7 +142,7 @@ export default function PartnersPage() {
           <section>
             <h2 className="text-xl font-semibold text-navy mb-3">Payment terms</h2>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
-              <li>Net 30 monthly via Stripe</li>
+              <li>Net 30 monthly via PayPal or Wise</li>
               <li>$50 minimum payout threshold (rolls over if not met)</li>
               <li>180-day cookie window on your referral link</li>
               <li>Manual deal-registration available for guaranteed attribution</li>
