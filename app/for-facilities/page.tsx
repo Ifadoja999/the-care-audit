@@ -95,10 +95,19 @@ export default function ForFacilitiesPage() {
     if (!selected) return;
     setCheckoutLoading(tier);
     try {
+      const promotekitReferral =
+        typeof window !== 'undefined'
+          ? (window as unknown as { promotekit_referral?: string }).promotekit_referral
+          : undefined;
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ facility_id: selected.id, tier, billing_period: billingPeriod }),
+        body: JSON.stringify({
+          facility_id: selected.id,
+          tier,
+          billing_period: billingPeriod,
+          promotekit_referral: promotekitReferral ?? null,
+        }),
       });
       const data = await res.json();
       if (data.url) {

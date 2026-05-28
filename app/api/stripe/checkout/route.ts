@@ -8,7 +8,7 @@ const VALID_BILLING_PERIODS = ['monthly', 'annual'] as const;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { facility_id, tier, billing_period = 'monthly' } = body;
+    const { facility_id, tier, billing_period = 'monthly', promotekit_referral } = body;
 
     if (!facility_id || !tier || !VALID_TIERS.includes(tier)) {
       return NextResponse.json({ error: 'Invalid facility_id or tier' }, { status: 400 });
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
         facility_id: facility.id,
         tier,
         facility_name: facility.facility_name,
+        promotekit_referral: promotekit_referral ?? undefined,
       },
       subscription_data: {
         trial_period_days: 7,

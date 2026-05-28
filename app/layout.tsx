@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { DM_Serif_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
@@ -58,6 +59,11 @@ export default function RootLayout({
       </head>
       <body className={`${heading.variable} ${body.variable} font-sans`}>
         {children}
+        <Script
+          src="https://cdn.promotekit.com/pk.js"
+          strategy="afterInteractive"
+          data-promotekit="4452fa54-9654-4659-8272-6171daf2a24a"
+        />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
