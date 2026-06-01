@@ -6,6 +6,30 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thecareaudit.
 const PAGE_SIZE = 1000;
 const FACILITIES_PER_SITEMAP = 5000;
 
+// Placeholder ai_summary prefixes that indicate a facility has no real
+// inspection data yet. These boilerplate strings are reused verbatim across
+// many facilities in the same state. Pages with these summaries plus
+// total_violations IS NULL are treated as "thin" by the facility page
+// component and return HTTP 404 via notFound(). They MUST be excluded from
+// the sitemap or Google will report them as "Not found (404)" indexing errors.
+// Keep this list in sync with PLACEHOLDER_AI_SUMMARY_PREFIXES in
+// app/[state]/[city]/[facility]/page.tsx.
+const PLACEHOLDER_AI_SUMMARY_PREFIXES = [
+  'inspection data is being processed',
+  'no inspection data is currently available',
+  'inspection data is not yet available',
+];
+
+function isPlaceholderAiSummary(ai: string | null | undefined): boolean {
+  if (!ai) return true;
+  const head = ai.trimStart().toLowerCase();
+  return PLACEHOLDER_AI_SUMMARY_PREFIXES.some((p) => head.startsWith(p));
+}
+
+function hasThinContent(facility: { total_violations: number | null; ai_summary: string | null | undefined }): boolean {
+  return facility.total_violations === null && isPlaceholderAiSummary(facility.ai_summary);
+}
+
 /**
  * Generates sitemap index entries. Next.js creates /sitemap.xml as an index
  * pointing to /sitemap/0.xml, /sitemap/1.xml, etc.
@@ -129,8 +153,12 @@ async function buildFacilitySitemap(supabase: ReturnType<typeof createServerClie
     for (const f of data) {
       // Skip facilities with bad slug patterns (HTML entity artifacts)
       if (/39/.test(f.slug) || /-amp-/.test(f.slug)) continue;
-      // Skip thin pages (no violation data and no AI summary) — matches noindex condition in seo.ts
-      if (f.total_violations === null && !f.ai_summary) continue;
+      // Skip thin pages. The facility page component returns notFound() for any
+      // facility where total_violations IS NULL AND ai_summary is either null
+      // or starts with one of the boilerplate placeholder prefixes. We MUST
+      // exclude those URLs from the sitemap, otherwise Google crawls them,
+      // gets a 404, and flags them in Search Console as "Not found (404)".
+      if (hasThinContent(f)) continue;
 
       const isClosed = f.facility_status === 'closed';
       const hasData = f.total_violations !== null;
