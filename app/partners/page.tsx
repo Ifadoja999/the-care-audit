@@ -145,7 +145,7 @@ export default function PartnersPage() {
               <li>Net 30 monthly via PayPal or Wise</li>
               <li>$50 minimum payout threshold (rolls over if not met)</li>
               <li>180-day cookie window on your referral link</li>
-              <li>Manual deal-registration available to signed partners for guaranteed attribution</li>
+              <li>Unique promo code your clients use at checkout for $10 off their first month</li>
               <li>No exclusivity required. You can recommend competing tools without restriction.</li>
             </ul>
           </section>
