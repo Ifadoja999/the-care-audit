@@ -65,6 +65,15 @@ export async function POST(req: NextRequest) {
       payment_method_types: ['card'],
       payment_method_collection: 'always',
       line_items: [{ price: priceId, quantity: 1 }],
+      custom_fields: [
+        {
+          key: 'heard_about',
+          label: { type: 'custom', custom: 'How did you hear about us?' },
+          type: 'text',
+          optional: true,
+          text: { maximum_length: 200 },
+        },
+      ],
       metadata: {
         facility_id: facility.id,
         tier,
