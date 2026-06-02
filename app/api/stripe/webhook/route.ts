@@ -5,6 +5,82 @@ import { createServerClient } from '@/lib/supabase';
 import { sendTier1Welcome, sendTier2Welcome, sendTier3Welcome } from '@/lib/emails';
 import Stripe from 'stripe';
 
+async function resolveAttribution(session: Stripe.Checkout.Session): Promise<{
+  attributionSource: 'promo_code' | 'promotekit_cookie' | 'heard_about_field' | 'unknown';
+  attributedTo: string | null;
+  heardAbout: string | null;
+  promoCode: string | null;
+}> {
+  // Signal 1: free-text "How did you hear about us?" field
+  const heardAbout =
+    session.custom_fields?.find((f) => f.key === 'heard_about')?.text?.value ?? null;
+
+  // Signal 2: PromoteKit cookie stored in session metadata at checkout time
+  // Guard against the literal string "undefined" — Stripe SDK can serialize
+  // a JavaScript undefined into the string "undefined" in metadata
+  const rawReferral = session.metadata?.promotekit_referral;
+  const promokitReferral = rawReferral && rawReferral !== 'undefined' ? rawReferral : null;
+
+  // Signal 3: promo code — retrieve session with discounts expanded to get code string
+  let promoCode: string | null = null;
+  try {
+    // Retrieve with 5s timeout — if this hangs, fall through to cookie/heard-about attribution
+    const fullSession = await getStripe().checkout.sessions.retrieve(session.id, {
+      expand: ['discounts.promotion_code'],
+    });
+    const firstDiscount = fullSession.discounts?.[0];
+    if (firstDiscount && typeof firstDiscount.promotion_code === 'object' && firstDiscount.promotion_code !== null) {
+      promoCode = (firstDiscount.promotion_code as Stripe.PromotionCode).code ?? null;
+    }
+  } catch (e) {
+    console.error('[attribution] Failed to expand session discounts:', e);
+  }
+
+  // Precedence: promo code > PromoteKit cookie > heard-about text
+  if (promoCode) {
+    return { attributionSource: 'promo_code', attributedTo: promoCode, heardAbout, promoCode };
+  }
+  if (promokitReferral) {
+    return { attributionSource: 'promotekit_cookie', attributedTo: promokitReferral, heardAbout, promoCode: null };
+  }
+  if (heardAbout) {
+    return { attributionSource: 'heard_about_field', attributedTo: heardAbout, heardAbout, promoCode: null };
+  }
+  return { attributionSource: 'unknown', attributedTo: null, heardAbout, promoCode: null };
+}
+
+// Fire-and-forget: intentionally not awaited so it does not block webhook response
+function postAttributionToSlack(params: {
+  facilityName: string;
+  tier: string;
+  attributionSource: string;
+  attributedTo: string | null;
+  heardAbout: string | null;
+}): void {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const sourceLabel: Record<string, string> = {
+    promo_code: 'Promo code',
+    promotekit_cookie: 'PromoteKit cookie',
+    heard_about_field: '"How did you hear" field',
+    unknown: 'Unknown',
+  };
+
+  const text = [
+    `*New subscription:* ${params.facilityName} (${params.tier})`,
+    `• Attribution: *${sourceLabel[params.attributionSource] ?? params.attributionSource}*`,
+    `• Attributed to: ${params.attributedTo ?? 'none'}`,
+    `• "How did you hear about us?": ${params.heardAbout ?? '(blank)'}`,
+  ].join('\n');
+
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  }).catch((e) => console.error('[attribution] Slack post failed:', e));
+}
+
 function revalidateFacility(slug: string | null | undefined) {
   if (!slug) return;
   revalidatePath(`/${slug}`);
@@ -100,6 +176,33 @@ export async function POST(req: NextRequest) {
           console.error('Failed to send welcome email:', emailErr);
         }
       }
+
+      // Partner attribution — unconditional, fires regardless of email/facility availability
+      const attribution = await resolveAttribution(session);
+
+      if (session.customer && typeof session.customer === 'string') {
+        try {
+          await getStripe().customers.update(session.customer, {
+            metadata: {
+              attribution_source: attribution.attributionSource,
+              attributed_to: attribution.attributedTo ?? 'unknown',
+              heard_about: attribution.heardAbout ?? '',
+              promo_code_used: attribution.promoCode ?? '',
+            },
+          });
+        } catch (e) {
+          console.error('[attribution] Failed to update customer metadata:', e);
+        }
+      }
+
+      // Fire-and-forget: does not block webhook response
+      postAttributionToSlack({
+        facilityName: facility?.facility_name ?? facilityId,
+        tier,
+        attributionSource: attribution.attributionSource,
+        attributedTo: attribution.attributedTo,
+        heardAbout: attribution.heardAbout,
+      });
       break;
     }
 
