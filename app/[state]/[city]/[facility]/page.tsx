@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -107,16 +107,27 @@ export default async function FacilityPage({ params }: Props) {
   const slug = `${stateSlug}/${citySlug}/${facilitySlug}`;
 
   const facility = await getFacilityBySlug(slug);
-  if (!facility) notFound();
+
+  // Facility slug doesn't exist in the DB at all. Old sitemaps exposed URLs that
+  // were later removed, and Google keeps recrawling them. A 404 is treated as
+  // "maybe temporary" and recrawled indefinitely, so instead permanently redirect
+  // unknown slugs up to the state page (HTTP 308). Google follows the redirect,
+  // gets a 200, and drops the dead URL from the GSC report.
+  if (!facility) permanentRedirect(`/${stateSlug}`);
 
   // Facilities with no violation data and only a generic placeholder ai_summary
-  // (or no ai_summary at all) have no unique content. Return a real 404 so
-  // Google does not flag them as Soft 404. This catches both:
+  // (or no ai_summary at all) have no unique content. Previously these returned a
+  // 404, but Google treats 404 as temporary and recrawls the same thin URLs every
+  // 1-2 weeks, causing the GSC "Not found (404)" report to recur. Permanently
+  // redirect them to the parent city page (HTTP 308) instead. This tells Google
+  // the content moved, clears the 404 from GSC, and ends the recrawl cycle. If a
+  // facility is later enriched, the page renders normally and the redirect stops.
+  // This catches both:
   //  1. Directory-only rows (no enrichment yet) — total_violations IS NULL, ai_summary IS NULL
   //  2. Boilerplate rows where ai_summary starts with a templated phrase like
   //     "Inspection data is being processed" / "No inspection data is currently available"
   //     / "Inspection data is not yet available" (repeated verbatim across the state).
-  if (hasThinContent(facility)) notFound();
+  if (hasThinContent(facility)) permanentRedirect(`/${stateSlug}/${citySlug}`);
 
   const stateCode = slugToStateCode(stateSlug);
   const stateName = stateCode ? stateCodeToName(stateCode) : stateSlug;
