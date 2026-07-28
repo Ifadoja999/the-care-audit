@@ -16,9 +16,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { q } = await searchParams;
   const query = q?.trim() ?? '';
   if (!query) return { title: 'Search', alternates: { canonical: `${SITE_URL}/search` } };
+  // Query result pages must not be indexed. Google crawled the literal
+  // SearchAction template URL (/search?q={search_term_string}) and flagged it
+  // as a Soft 404 because it renders an empty "no results" page. noindex,follow
+  // drops every /search?q=... variant from the index while the bare /search
+  // interface page (returned above) stays indexable via the sitemap.
   return {
     title: `Results for "${query}"`,
     alternates: { canonical: `${SITE_URL}/search` },
+    robots: { index: false, follow: true },
   };
 }
 

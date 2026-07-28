@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getFacilitiesByCity, getFeaturedFacilities, resolveCity } from '@/lib/queries';
@@ -79,7 +79,17 @@ export default async function CityPage({ params }: Props) {
     }
   }
 
-  if (facilities.length === 0) notFound();
+  // City slug resolves to zero facilities (dead city, all-closed city, or a
+  // malformed slug Google indexed from an old sitemap). A hard 404 makes Google
+  // recrawl the dead URL indefinitely, which is what fills the GSC "Not found
+  // (404)" report. Instead permanently redirect up to the state page (HTTP 308),
+  // exactly like the facility page does for unknown/thin slugs. Google follows
+  // the redirect, gets a 200, and drops the dead URL. This also generalizes the
+  // one-off city-to-state redirects previously hand-maintained in next.config.
+  // The stateCode is already validated above, so /${stateSlug} is always a real
+  // state page. City pages revalidate every 24h, so a city that later gains a
+  // facility renders normally again.
+  if (facilities.length === 0) permanentRedirect(`/${stateSlug}`);
 
   // Use actual DB city name (preserves hyphens like "KAILUA-KONA") for display
   const cityName = facilities[0]?.city

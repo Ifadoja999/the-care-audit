@@ -195,6 +195,10 @@ const nextConfig: NextConfig = {
       ['sc', 'south-carolina'], ['sd', 'south-dakota'], ['tn', 'tennessee'], ['tx', 'texas'],
       ['ut', 'utah'], ['vt', 'vermont'], ['va', 'virginia'], ['wa', 'washington'],
       ['wv', 'west-virginia'], ['wi', 'wisconsin'], ['wy', 'wyoming'],
+      // Malformed DC slug that Google indexed (hard 404) → real DC state page.
+      // Found in GSC "Not found (404)" export 2026-07-28. DC's canonical slug is
+      // district-of-columbia (see lib/states.ts). Not linked internally anymore.
+      ['washington-d.c', 'district-of-columbia'],
     ];
 
     return [
